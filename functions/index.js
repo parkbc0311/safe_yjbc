@@ -39,10 +39,6 @@ exports.sendSOSNotification = onDocumentCreated(
 
       const message = {
         tokens,
-        notification: {
-          title: `${emoji} ${fromLabel}가 집에 간대요`,
-          body: addressText,
-        },
         data: {
           sender: from,
           receiver: to,
@@ -50,21 +46,8 @@ exports.sendSOSNotification = onDocumentCreated(
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
           address: snap.data().address ?? "",
+          title: `${emoji} ${fromLabel}가 집에 간대요`,
           body: addressText,
-        },
-        webpush: {
-          notification: {
-            icon: "/icon-192.png",
-            requireInteraction: true,
-            vibrate: [300, 100, 300, 100, 300],
-            actions: [
-              { action: "open-map", title: "📍 지도 보기" },
-              { action: "dismiss",  title: "확인" },
-            ],
-          },
-          fcmOptions: {
-            link: `/${to}.html`,
-          },
         },
       };
 
