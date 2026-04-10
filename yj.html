@@ -583,10 +583,10 @@
       "bc가 출발했어요! 마중 나갈까요? 👀",
     ];
 
-    // BC가 보낸 이벤트 실시간 감지
+    // YJ가 보낸 이벤트 실시간 감지
     const q = query(
       collection(db, "home_events"),
-      where("to", "==", "bc"),
+      where("to", "==", "yj"),
       orderBy("timestamp", "desc"),
       limit(3)
     );
