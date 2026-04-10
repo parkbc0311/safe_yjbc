@@ -43,11 +43,14 @@ exports.sendSOSNotification = onDocumentCreated(
             : "긴급 호출이 도착했습니다",
         },
         data: {
-          from,
-          to,
+          sender: from,
+          receiver: to,
           latitude: String(latitude ?? ""),
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
+          body: latitude
+            ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`
+            : "긴급 호출이 도착했습니다",
         },
         webpush: {
           notification: {
