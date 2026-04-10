@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="집가요 BC" />
+  <link rel="manifest" href="/manifest-bc.json" />
+  <title>집가요! — BC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky: #EAF4FF;
+      --sky2: #D6EAFF;
+      --blue: #4A9EE8;
+      --blue-light: #85C1F5;
+      --blue-dark: #1E6FB5;
+      --teal: #00B4D8;
+      --lavender: #C77DFF;
+      --mint: #06D6A0;
+      --ink: #0D1B2E;
+      --ink2: #1E3A5F;
+      --muted: #6B8FAE;
+      --white: #F5FAFF;
+      --border: rgba(74,158,232,0.22);
+      --shadow: rgba(30,111,181,0.15);
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--sky);
+      color: var(--ink);
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 48px) 24px env(safe-area-inset-bottom, 36px);
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(74,158,232,0.1) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none; z-index: 0;
+    }
+
+    .clouds {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 120px;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.7;
+    }
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+    .c1 { width: 90px; height: 30px; top: 16px; left: -20px; animation: cloudDrift 22s linear infinite; }
+    .c1::before { width: 40px; height: 40px; top: -20px; left: 12px; }
+    .c1::after  { width: 30px; height: 30px; top: -14px; left: 42px; }
+
+    .c2 { width: 65px; height: 24px; top: 45px; left: 40%; animation: cloudDrift 28s linear infinite; animation-delay: -10s; opacity: 0.5; }
+    .c2::before { width: 30px; height: 30px; top: -16px; left: 8px; }
+    .c2::after  { width: 22px; height: 22px; top: -10px; left: 30px; }
+
+    .c3 { width: 110px; height: 36px; top: 8px; left: 55%; animation: cloudDrift 19s linear infinite; animation-delay: -6s; }
+    .c3::before { width: 48px; height: 48px; top: -24px; left: 14px; }
+    .c3::after  { width: 36px; height: 36px; top: -16px; left: 52px; }
+
+    @keyframes cloudDrift {
+      from { transform: translateX(-180px); }
+      to   { transform: translateX(calc(100vw + 180px)); }
+    }
+
+    .header {
+      z-index: 1;
+      text-align: center;
+      animation: bounceIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .name-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--blue);
+      color: white;
+      padding: 4px 14px 4px 10px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      box-shadow: 0 3px 12px var(--shadow);
+    }
+
+    .header h1 {
+      font-family: 'Gaegu', cursive;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+
+    .header h1 .wave {
+      display: inline-block;
+      animation: waveHand 1.5s ease-in-out infinite;
+      transform-origin: 70% 70%;
+    }
+    @keyframes waveHand {
+      0%, 100% { transform: rotate(0deg); }
+      25%       { transform: rotate(20deg); }
+      75%       { transform: rotate(-10deg); }
+    }
+
+    .header-sub {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .btn-area {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: bounceIn 0.8s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .house-btn-wrap { position: relative; }
+
+    .bounce-ring {
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 3px dashed var(--blue-light);
+      opacity: 0;
+      animation: bounceRing 2.5s ease-out infinite;
+    }
+    .bounce-ring:nth-child(2) { inset: -24px; animation-delay: 0.8s; }
+
+    @keyframes bounceRing {
+      0%   { opacity: 0.7; transform: scale(0.9); }
+      100% { opacity: 0;   transform: scale(1.3); }
+    }
+
+    .house-btn {
+      position: relative;
+      width: 172px; height: 172px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(145deg, #A8D8FF 0%, var(--blue-light) 50%, var(--blue) 100%);
+      box-shadow:
+        0 8px 0 var(--blue-dark),
+        0 12px 30px var(--shadow),
+        inset 0 2px 0 rgba(255,255,255,0.5);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.12s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.12s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .house-btn:active {
+      transform: translateY(5px);
+      box-shadow:
+        0 3px 0 var(--blue-dark),
+        0 6px 16px var(--shadow),
+        inset 0 2px 0 rgba(255,255,255,0.4);
+    }
+
+    .house-emoji {
+      font-size: 3.2rem;
+      line-height: 1;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.1));
+    }
+
+    .house-btn:active .house-emoji { animation: houseWiggle 0.4s ease; }
+
+    @keyframes houseWiggle {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25%       { transform: rotate(-8deg) scale(1.1); }
+      75%       { transform: rotate(8deg) scale(1.1); }
+    }
+
+    .house-label {
+      font-family: 'Gaegu', cursive;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.12);
+    }
+
+    .house-sublabel {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.12em;
+    }
+
+    .to-label {
+      font-family: 'Gaegu', cursive;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+    .to-label strong { color: var(--blue-dark); font-weight: 700; }
+
+    .status-area {
+      z-index: 1;
+      text-align: center;
+      animation: bounceIn 0.9s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Gaegu', cursive;
+      font-size: 0.95rem;
+      color: var(--muted);
+      transition: all 0.3s;
+      box-shadow: 0 3px 12px var(--shadow);
+    }
+    .status-pill.success { border-color: var(--mint); color: #07A07A; }
+    .status-pill.error   { border-color: #FF6B9D; color: #C0306A; }
+    .status-pill.loading { border-color: var(--blue-light); color: var(--blue-dark); }
+
+    .dot-live {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+      animation: livePulse 1.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes livePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(0.6); opacity: 0.5; }
+    }
+
+    /* Incoming banner */
+    .incoming-banner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 14px;
+      background: linear-gradient(135deg, #EAF4FF, #D0E8FF);
+      border-bottom: 3px solid var(--blue);
+      box-shadow: 0 4px 20px var(--shadow);
+      animation: slideDown 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .incoming-banner.show { display: block; }
+    @keyframes slideDown {
+      from { transform: translateY(-110%); }
+      to   { transform: translateY(0); }
+    }
+
+    .incoming-inner { display: flex; align-items: center; gap: 12px; }
+
+    .incoming-icon {
+      font-size: 2.2rem;
+      animation: bounceIcon 0.6s cubic-bezier(0.34,1.56,0.64,1);
+      flex-shrink: 0;
+    }
+    @keyframes bounceIcon {
+      from { transform: scale(0) rotate(-20deg); }
+      to   { transform: scale(1) rotate(0deg); }
+    }
+
+    .incoming-text { flex: 1; }
+    .incoming-who { font-family: 'Gaegu', cursive; font-size: 1.15rem; color: var(--ink); font-weight: 700; }
+    .incoming-desc { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    .incoming-map-btn {
+      padding: 8px 14px;
+      background: var(--blue);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-family: 'Gaegu', cursive;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 3px 0 var(--blue-dark);
+      white-space: nowrap;
+    }
+
+    .bottom-area {
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: bounceIn 1s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .reg-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 16px;
+      border: 2px dashed var(--border);
+      background: rgba(255,255,255,0.6);
+      font-family: 'Gaegu', cursive;
+      font-size: 1rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .reg-btn:active { background: var(--white); }
+    .reg-btn.done { border-style: solid; border-color: var(--mint); color: #07A07A; background: rgba(6,214,160,0.06); }
+
+    .log-title { font-family: 'Gaegu', cursive; font-size: 0.9rem; color: var(--muted); text-align: center; margin-top: 2px; }
+    .log-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .log-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 3px 10px var(--shadow);
+      animation: bounceIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .log-emoji { font-size: 1.4rem; flex-shrink: 0; }
+    .log-info  { flex: 1; }
+    .log-time  { font-size: 0.68rem; color: var(--muted); }
+    .log-msg   { font-family: 'Gaegu', cursive; font-size: 0.95rem; color: var(--ink2); margin-top: 1px; }
+
+    .log-map {
+      font-size: 0.72rem;
+      color: var(--blue-dark);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      white-space: nowrap;
+      font-family: 'Gaegu', cursive;
+    }
+
+    .log-empty {
+      text-align: center;
+      padding: 14px;
+      font-family: 'Gaegu', cursive;
+      font-size: 0.95rem;
+      color: var(--muted);
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(234,244,255,0.93);
+      backdrop-filter: blur(12px);
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
+    }
+    .overlay.active { display: flex; }
+
+    .overlay-emoji {
+      font-size: 4rem;
+      animation: overlayBounce 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes overlayBounce {
+      0%   { transform: scale(0) rotate(-30deg); }
+      60%  { transform: scale(1.15) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--sky2);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .overlay-title { font-family: 'Gaegu', cursive; font-size: 2rem; font-weight: 700; color: var(--ink); }
+    .overlay-sub { font-family: 'Gaegu', cursive; font-size: 1.05rem; color: var(--muted); text-align: center; line-height: 1.7; }
+
+    @keyframes bounceIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="clouds">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+  </div>
+
+  <!-- Incoming banner: YJ가 집에 간다고 알림 -->
+  <div class="incoming-banner" id="incomingBanner">
+    <div class="incoming-inner">
+      <div class="incoming-icon">🏃‍♀️</div>
+      <div class="incoming-text">
+        <div class="incoming-who" id="incomingWho">yj가 집으로 출발했어요!</div>
+        <div class="incoming-desc" id="incomingDesc">위치 불러오는 중...</div>
+      </div>
+      <a class="incoming-map-btn" id="incomingMapBtn" href="#" target="_blank">📍 위치</a>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="name-tag">👦 BC의 앱</div>
+    <h1>나 집에 간다~! <span class="wave">👋</span></h1>
+    <p class="header-sub">버튼 누르면 yj한테 바로 알림 가요<br/>위치도 같이 쏴줌 🗺️</p>
+  </div>
+
+  <div class="btn-area">
+    <div class="house-btn-wrap">
+      <div class="bounce-ring"></div>
+      <div class="bounce-ring"></div>
+      <button class="house-btn" id="mainBtn" onclick="sendGoHome()">
+        <span class="house-emoji">🏠</span>
+        <span class="house-label">집에 간다!</span>
+        <span class="house-sublabel">tap!</span>
+      </button>
+    </div>
+    <div class="to-label">→ <strong>yj</strong> 에게 알림 전송</div>
+  </div>
+
+  <div class="status-area">
+    <div class="status-pill" id="statusPill">
+      <div class="dot-live"></div>
+      <span id="statusText">대기 중 ☁️</span>
+    </div>
+  </div>
+
+  <div class="bottom-area">
+    <button class="reg-btn" id="regBtn" onclick="registerToken()">🔔 알림 수신 등록하기</button>
+
+    <div class="log-title">yj가 보낸 알림 📬</div>
+    <div class="log-list" id="logList">
+      <div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠</div>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div class="overlay" id="sendingOverlay">
+    <div class="spinner"></div>
+    <div class="overlay-title">전송 중... 🚀</div>
+    <div class="overlay-sub">GPS 찍는 중이에요<br/>잠깐만요!</div>
+  </div>
+
+  <div class="overlay" id="successOverlay" onclick="this.classList.remove('active')">
+    <div class="overlay-emoji">🎉</div>
+    <div class="overlay-title">전송 완료!</div>
+    <div class="overlay-sub" id="successMsg">yj한테 알림 보냈어요~<br/>빨리 집에 가요! 🏃‍♂️💨</div>
+    <div style="font-size:0.75rem;color:var(--muted);font-family:'Gaegu',cursive">화면 아무데나 탭하면 닫혀요</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ✅ Firebase 설정
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const VAPID_KEY = "YOUR_VAPID_KEY";
+    const MY_USER = "bc";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const SEND_MSGS = [
+      "나 간다~ 기다려! 🏃‍♂️💨",
+      "퇴근완료 🫡 집으로 고고",
+      "드디어 집에 간다아아 🎊",
+      "나 출발~ 밥 차려놔요 🍚",
+      "지하철 탔어요~ 곧 가요! 🚇",
+      "이제 진짜 간다! (진짜임) 🏠",
+      "귀가 시작 🚨 삐용삐용",
+    ];
+
+    const RECV_MSGS = [
+      "yj가 집으로 달려오는 중이래요! 🏃‍♀️",
+      "yj가 퇴근했대요~ 🎉",
+      "yj 곧 도착한대요! 🚌💨",
+      "yj가 출발했어요! 마중 나갈까요? 👀",
+    ];
+
+    // YJ가 보낸 이벤트 실시간 감지
+    const q = query(
+      collection(db, "home_events"),
+      where("from", "==", "yj"),
+      orderBy("timestamp", "desc"),
+      limit(3)
+    );
+
+    let firstLoad = true;
+    onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        renderLog(snap.docs);
+        if (!firstLoad) showIncoming(snap.docs[0].data());
+      }
+      firstLoad = false;
+    });
+
+    function showIncoming(data) {
+      const banner = document.getElementById('incomingBanner');
+      const msg = RECV_MSGS[Math.floor(Math.random() * RECV_MSGS.length)];
+      document.getElementById('incomingWho').textContent = msg;
+      document.getElementById('incomingDesc').textContent =
+        `📍 ${Number(data.latitude).toFixed(4)}, ${Number(data.longitude).toFixed(4)}`;
+      document.getElementById('incomingMapBtn').href =
+        data.mapsUrl || `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
+      banner.classList.add('show');
+      if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+      setTimeout(() => banner.classList.remove('show'), 10000);
+    }
+
+    function renderLog(docs) {
+      const list = document.getElementById('logList');
+      list.innerHTML = '';
+      docs.forEach(doc => {
+        const d = doc.data();
+        const t = d.timestamp?.toDate() || new Date();
+        const timeStr = t.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const el = document.createElement('div');
+        el.className = 'log-item';
+        el.innerHTML = `
+          <div class="log-emoji">🏠</div>
+          <div class="log-info">
+            <div class="log-time">${timeStr}</div>
+            <div class="log-msg">${d.message || 'yj가 집에 간대요!'}</div>
+          </div>
+          <a class="log-map" href="${d.mapsUrl}" target="_blank">지도 →</a>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    window.sendGoHome = async function() {
+      const btn = document.getElementById('mainBtn');
+      btn.disabled = true;
+      document.getElementById('sendingOverlay').classList.add('active');
+      setStatus('loading', 'GPS 찍는 중... 🛰️');
+
+      try {
+        const pos = await getGPS();
+        const { latitude, longitude } = pos.coords;
+        const message = SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+
+        await addDoc(collection(db, "home_events"), {
+          from: MY_USER, to: "yj",
+          latitude, longitude,
+          accuracy: Math.round(pos.coords.accuracy),
+          mapsUrl: `https://maps.google.com/?q=${latitude},${longitude}`,
+          message,
+          timestamp: serverTimestamp()
+        });
+
+        document.getElementById('sendingOverlay').classList.remove('active');
+        document.getElementById('successMsg').innerHTML =
+          `yj한테 알림 보냈어요~<br/><strong style="color:var(--blue-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}</span>`;
+        document.getElementById('successOverlay').classList.add('active');
+        setStatus('success', '전송 완료! ✅');
+
+        setTimeout(() => {
+          document.getElementById('successOverlay').classList.remove('active');
+          btn.disabled = false;
+          setStatus('', '대기 중 ☁️');
+        }, 5000);
+
+      } catch(e) {
+        document.getElementById('sendingOverlay').classList.remove('active');
+        btn.disabled = false;
+        if (e.code === 1) setStatus('error', '📍 위치 권한 허용해주세요!');
+        else setStatus('error', '전송 실패... 다시 눌러봐요 🥲');
+        console.error(e);
+      }
+    };
+
+    window.registerToken = async function() {
+      const btn = document.getElementById('regBtn');
+      btn.textContent = '등록 중... 🔄';
+      btn.disabled = true;
+      try {
+        const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js");
+        const messaging = getMessaging(app);
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') throw new Error('권한 거부');
+        const sw = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
+        await addDoc(collection(db, "receiver_tokens"), {
+          user: MY_USER, token, registeredAt: new Date().toISOString()
+        });
+        localStorage.setItem('home_token_ok', '1');
+        btn.textContent = '✅ 알림 등록 완료!';
+        btn.classList.add('done');
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = '🔔 알림 수신 등록하기 (재시도)';
+        console.error(e);
+      }
+    };
+
+    if (localStorage.getItem('home_token_ok')) {
+      const btn = document.getElementById('regBtn');
+      btn.textContent = '✅ 알림 등록 완료!';
+      btn.classList.add('done');
+    }
+
+    function getGPS() {
+      return new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: true, timeout: 10000 })
+      );
+    }
+
+    function setStatus(type, text) {
+      document.getElementById('statusPill').className = 'status-pill ' + type;
+      document.getElementById('statusText').textContent = text;
+    }
+  </script>
+</body>
+</html>
