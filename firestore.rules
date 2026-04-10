@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /sos_events/{docId} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if false;
+    }
+    match /home_events/{docId} {
+      allow create: if true;
+      allow read: if true;
+      allow update, delete: if false;
+    }
+    match /receiver_tokens/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
