@@ -15,13 +15,13 @@ exports.sendSOSNotification = onDocumentCreated(
     const snap = event.data;
     if (!snap) return;
 
-    const { from, to, latitude, longitude, mapsUrl } = snap.data();
-    console.log(`SOS: ${from} → ${to}`, { latitude, longitude });
+    const { from, to, latitude, longitude, mapsUrl, emergency } = snap.data();
+    const isEmergency = emergency === true;
+    console.log(`${isEmergency ? '🚨 긴급' : '🏠 귀가'}: ${from} → ${to}`, { latitude, longitude });
 
     try {
       const db = getFirestore();
 
-      // 수신자(to)의 FCM 토큰 조회
       const tokensSnap = await db.collection("receiver_tokens")
         .where("user", "==", to)
         .get();
@@ -34,9 +34,17 @@ exports.sendSOSNotification = onDocumentCreated(
       const tokens = tokensSnap.docs.map(d => d.data().token).filter(Boolean);
       const fromLabel = from === "yj" ? "연주" : "병철";
       const emoji = from === "yj" ? "🤍" : "💛";
-      const addressText = mapsUrl && mapsUrl.includes('google.com')
-        ? (snap.data().address ? `${snap.data().address} 근처` : `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`)
-        : (snap.data().address ? `${snap.data().address} 근처` : "집에 가는 중이에요");
+      const addressText = snap.data().address
+        ? `${snap.data().address} 근처`
+        : `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`;
+
+      // 긴급 vs 일반 메시지 분기
+      const notifTitle = isEmergency
+        ? `🚨 긴급!! ${fromLabel}에게 무슨일이 생겼나봐요!!`
+        : `${emoji} ${fromLabel}가 집에 간대요`;
+      const notifBody = isEmergency
+        ? `얼른 전화해보세요!! 📍 ${addressText}`
+        : addressText;
 
       const message = {
         tokens,
@@ -47,8 +55,9 @@ exports.sendSOSNotification = onDocumentCreated(
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
           address: snap.data().address ?? "",
-          title: `${emoji} ${fromLabel}가 집에 간대요`,
-          body: addressText,
+          emergency: String(isEmergency),
+          title: notifTitle,
+          body: notifBody,
         },
       };
 

@@ -473,6 +473,65 @@
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
+
+    /* ── 긴급 모드 스타일 ── */
+    .house-btn.emergency-1 { background: linear-gradient(145deg, #FFD166, #FF8C42, #FF6B6B); }
+    .house-btn.emergency-2 { background: linear-gradient(145deg, #FF8C42, #FF4444, #CC0000); box-shadow: 0 8px 0 #8B0000, 0 12px 30px rgba(255,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.4); }
+    .house-btn.emergency-3 {
+      background: linear-gradient(145deg, #FF4444, #CC0000, #880000);
+      box-shadow: 0 8px 0 #550000, 0 12px 40px rgba(255,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3);
+      animation: emergencyPulse 0.5s ease-in-out infinite;
+    }
+    @keyframes emergencyPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 0 #550000, 0 12px 40px rgba(255,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3); }
+      50%       { transform: scale(1.04); box-shadow: 0 8px 0 #550000, 0 16px 60px rgba(255,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.3); }
+    }
+
+    .tap-counter {
+      position: absolute;
+      top: -12px; right: -8px;
+      background: #FF2222;
+      color: white;
+      font-family: 'Gaegu', cursive;
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px rgba(255,0,0,0.4);
+      animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 10;
+    }
+    .tap-counter.show { display: flex; }
+    @keyframes popIn {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+
+    /* 긴급 incoming banner */
+    .incoming-banner.emergency {
+      background: linear-gradient(135deg, #FF2222, #CC0000) !important;
+      border-bottom-color: #880000 !important;
+      animation: emergencyBannerFlash 0.4s ease-in-out 3;
+    }
+    @keyframes emergencyBannerFlash {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.7; }
+    }
+    .incoming-banner.emergency .incoming-who { color: white !important; }
+    .incoming-banner.emergency .incoming-desc { color: rgba(255,255,255,0.85) !important; }
+
+    /* 긴급 log item */
+    .log-item.emergency {
+      border-color: #FF4444;
+      background: #FFF5F5;
+    }
+    .log-item.emergency .log-emoji::after {
+      content: ' 🚨';
+    }
   </style>
 </head>
 <body>
@@ -505,10 +564,11 @@
     <div class="house-btn-wrap">
       <div class="bounce-ring"></div>
       <div class="bounce-ring"></div>
-      <button class="house-btn" id="mainBtn" onclick="sendGoHome()">
-        <span class="house-emoji">🏠</span>
-        <span class="house-label">집에 간다!</span>
-        <span class="house-sublabel">tap!</span>
+      <div class="tap-counter" id="tapCounter">1</div>
+      <button class="house-btn" id="mainBtn" onclick="handleBtnClick()">
+        <span class="house-emoji" id="houseEmoji">🏠</span>
+        <span class="house-label" id="houseLabel">집에 간다!</span>
+        <span class="house-sublabel" id="houseSublabel">tap!</span>
       </button>
     </div>
     <div class="to-label">→ <strong>bc</strong> 에게 알림 전송</div>
@@ -524,7 +584,7 @@
   <div class="bottom-area">
     <button class="reg-btn" id="regBtn" onclick="registerToken()">🔔 알림 수신 등록하기</button>
 
-    <div class="log-title">bc가 보낸 알림 📬</div>
+    <div class="log-title">bc가 보낸 알림 📬 <span style="font-size:0.8rem;color:var(--muted);display:block;margin-top:4px;">이 페이지는 bc가 YJ에게 보낸 알림을 표시해요.</span></div>
     <div class="log-list" id="logList"></div>
   </div>
 
@@ -604,8 +664,19 @@
 
     function showIncoming(data) {
       const banner = document.getElementById('incomingBanner');
-      const msg = RECV_MSGS[Math.floor(Math.random() * RECV_MSGS.length)];
-      document.getElementById('incomingWho').textContent = msg;
+      const isEmergency = data.emergency === true;
+
+      if (isEmergency) {
+        document.getElementById('incomingWho').textContent = '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!';
+        banner.classList.add('emergency');
+        if (navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 500, 100, 500]);
+      } else {
+        const msg = RECV_MSGS[Math.floor(Math.random() * RECV_MSGS.length)];
+        document.getElementById('incomingWho').textContent = msg;
+        banner.classList.remove('emergency');
+        if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+      }
+
       document.getElementById('incomingDesc').textContent =
         data.address
           ? `📍 ${data.address} 근처`
@@ -613,8 +684,10 @@
       document.getElementById('incomingMapBtn').href =
         data.mapsUrl || `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
       banner.classList.add('show');
-      if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
-      setTimeout(() => banner.classList.remove('show'), 10000);
+      setTimeout(() => {
+        banner.classList.remove('show');
+        banner.classList.remove('emergency');
+      }, isEmergency ? 20000 : 10000);
     }
 
     function renderLog(docs) {
@@ -625,15 +698,19 @@
         const t = d.timestamp?.toDate() || new Date();
         const timeStr = t.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const el = document.createElement('div');
-        el.className = 'log-item';
+        const isEmergency = d.emergency === true;
+        el.className = 'log-item' + (isEmergency ? ' emergency' : '');
         const locationText = d.address
           ? `${d.address} 근처`
           : `위치: ${Number(d.latitude).toFixed(4)}, ${Number(d.longitude).toFixed(4)}`;
+        const msgText = isEmergency
+          ? '🚨 긴급 호출!'
+          : (d.message || 'bc가 집에 간대요!');
         el.innerHTML = `
-          <div class="log-emoji">🏠</div>
+          <div class="log-emoji">${isEmergency ? '🚨' : '🏠'}</div>
           <div class="log-info">
             <div class="log-time">${timeStr}</div>
-            <div class="log-msg">${d.message || 'bc가 집에 간대요!'}</div>
+            <div class="log-msg">${msgText}</div>
             <div class="log-sub">${locationText}</div>
           </div>
           <a class="log-map" href="${d.mapsUrl}" target="_blank">지도 →</a>
@@ -644,19 +721,85 @@
 
     function renderEmpty() {
       const list = document.getElementById('logList');
-      list.innerHTML = `<div class="log-empty">아직 bc가 집에 간다고 안 했네요 🫠</div>`;
+      list.innerHTML = `<div class="log-empty">아직 bc가 집에 간다고 안 했네요 🫠<br/>YJ가 보낸 알림은 BC 페이지에서 보여요.</div>`;
     }
 
-    window.sendGoHome = async function() {
+    // ── 연속 클릭 긴급 감지 ──
+    let tapCount = 0;
+    let tapTimer = null;
+    const EMERGENCY_TAPS = 5;
+    const TAP_WINDOW_MS = 3000; // 3초 안에 5번
+
+    window.handleBtnClick = function() {
+      tapCount++;
+      const counter = document.getElementById('tapCounter');
+      const btn = document.getElementById('mainBtn');
+      const emoji = document.getElementById('houseEmoji');
+      const label = document.getElementById('houseLabel');
+      const sublabel = document.getElementById('houseSublabel');
+
+      // 카운터 뱃지 표시
+      if (tapCount >= 2 && tapCount < EMERGENCY_TAPS) {
+        counter.textContent = tapCount;
+        counter.classList.add('show');
+        // 버튼 색상 단계별 변화
+        btn.className = 'house-btn emergency-' + (tapCount <= 2 ? '1' : tapCount <= 3 ? '1' : '2');
+        setStatus('loading', `${EMERGENCY_TAPS - tapCount}번 더 누르면 긴급 호출! 🚨`);
+      }
+
+      // 타이머 리셋
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => {
+        // 시간 초과 → 일반 전송
+        if (tapCount > 0 && tapCount < EMERGENCY_TAPS) {
+          sendGoHome(false);
+        }
+        resetTapState();
+      }, TAP_WINDOW_MS);
+
+      // 5번 달성 → 긴급!
+      if (tapCount >= EMERGENCY_TAPS) {
+        clearTimeout(tapTimer);
+        btn.className = 'house-btn emergency-3';
+        emoji.textContent = '🚨';
+        label.textContent = '긴급 호출!!';
+        sublabel.textContent = '전송 중...';
+        counter.classList.remove('show');
+        setStatus('error', '🚨 긴급 호출 전송 중!');
+        sendGoHome(true);
+        setTimeout(resetTapState, 5000);
+      }
+    };
+
+    function resetTapState() {
+      tapCount = 0;
+      clearTimeout(tapTimer);
+      const btn = document.getElementById('mainBtn');
+      const emoji = document.getElementById('houseEmoji');
+      const label = document.getElementById('houseLabel');
+      const sublabel = document.getElementById('houseSublabel');
+      const counter = document.getElementById('tapCounter');
+      btn.className = 'house-btn';
+      emoji.textContent = '🏠';
+      label.textContent = '집에 간다!';
+      sublabel.textContent = 'tap!';
+      counter.classList.remove('show');
+    }
+
+    async function sendGoHome(isEmergency = false) {
       const btn = document.getElementById('mainBtn');
       btn.disabled = true;
-      document.getElementById('sendingOverlay').classList.add('active');
-      setStatus('loading', 'GPS 찍는 중... 🛰️');
+      if (!isEmergency) {
+        document.getElementById('sendingOverlay').classList.add('active');
+        setStatus('loading', 'GPS 찍는 중... 🛰️');
+      }
 
       try {
         const pos = await getGPS();
         const { latitude, longitude } = pos.coords;
-        const message = SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+        const message = isEmergency
+          ? '🚨 긴급!! 연주에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!'
+          : SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
         const address = await reverseGeocode(latitude, longitude);
 
         await addDoc(collection(db, "home_events"), {
@@ -666,14 +809,21 @@
           mapsUrl: `https://maps.google.com/?q=${latitude},${longitude}`,
           address,
           message,
+          emergency: isEmergency,
           timestamp: serverTimestamp()
         });
 
         document.getElementById('sendingOverlay').classList.remove('active');
-        document.getElementById('successMsg').innerHTML =
-          `bc한테 알림 보냈어요~<br/><strong style="color:var(--orange-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
+
+        if (isEmergency) {
+          document.getElementById('successMsg').innerHTML =
+            `🚨 <strong style="color:#CC0000">긴급 호출 완료!</strong><br/>bc한테 긴급 알림을 보냈어요!<br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
+        } else {
+          document.getElementById('successMsg').innerHTML =
+            `bc한테 알림 보냈어요~<br/><strong style="color:var(--orange-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
+        }
         document.getElementById('successOverlay').classList.add('active');
-        setStatus('success', '전송 완료! ✅');
+        setStatus('success', isEmergency ? '🚨 긴급 호출 완료!' : '전송 완료! ✅');
 
         setTimeout(() => {
           document.getElementById('successOverlay').classList.remove('active');
@@ -688,7 +838,7 @@
         else setStatus('error', '전송 실패... 다시 눌러봐요 🥲');
         console.error(e);
       }
-    };
+    }
 
     window.registerToken = async function() {
       const btn = document.getElementById('regBtn');

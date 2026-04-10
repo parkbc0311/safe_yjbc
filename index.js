@@ -2,6 +2,7 @@
 // 양방향 SOS - yj ↔ bc
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -14,13 +15,13 @@ exports.sendSOSNotification = onDocumentCreated(
     const snap = event.data;
     if (!snap) return;
 
-    const { from, to, latitude, longitude, mapsUrl } = snap.data();
-    console.log(`SOS: ${from} → ${to}`, { latitude, longitude });
+    const { from, to, latitude, longitude, mapsUrl, emergency } = snap.data();
+    const isEmergency = emergency === true;
+    console.log(`${isEmergency ? '🚨 긴급' : '🏠 귀가'}: ${from} → ${to}`, { latitude, longitude });
 
     try {
       const db = getFirestore();
 
-      // 수신자(to)의 FCM 토큰 조회
       const tokensSnap = await db.collection("receiver_tokens")
         .where("user", "==", to)
         .get();
@@ -31,42 +32,46 @@ exports.sendSOSNotification = onDocumentCreated(
       }
 
       const tokens = tokensSnap.docs.map(d => d.data().token).filter(Boolean);
-      const fromLabel = from === "yj" ? "YJ" : "BC";
+      const fromLabel = from === "yj" ? "연주" : "병철";
       const emoji = from === "yj" ? "🤍" : "💛";
+      const addressText = snap.data().address
+        ? `${snap.data().address} 근처`
+        : `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`;
+
+      // 긴급 vs 일반 메시지 분기
+      const notifTitle = isEmergency
+        ? `🚨 긴급!! ${fromLabel}에게 무슨일이 생겼나봐요!!`
+        : `${emoji} ${fromLabel}가 집에 간대요`;
+      const notifBody = isEmergency
+        ? `얼른 전화해보세요!! 📍 ${addressText}`
+        : addressText;
 
       const message = {
         tokens,
-        notification: {
-          title: `${emoji} ${fromLabel}가 호출했어요!`,
-          body: latitude
-            ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`
-            : "긴급 호출이 도착했습니다",
-        },
         data: {
-          from,
-          to,
+          sender: from,
+          receiver: to,
           latitude: String(latitude ?? ""),
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
-        },
-        webpush: {
-          notification: {
-            icon: "/icon-192.png",
-            requireInteraction: true,
-            vibrate: [300, 100, 300, 100, 300],
-            actions: [
-              { action: "open-map", title: "📍 지도 보기" },
-              { action: "dismiss",  title: "확인" },
-            ],
-          },
-          fcmOptions: {
-            link: `/${to}.html`,
-          },
+          address: snap.data().address ?? "",
+          emergency: String(isEmergency),
+          title: notifTitle,
+          body: notifBody,
         },
       };
 
       const response = await getMessaging().sendEachForMulticast(message);
       console.log(`성공: ${response.successCount}, 실패: ${response.failureCount}`);
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error("FCM 실패", {
+            token: tokens[idx],
+            code: resp.error?.code,
+            message: resp.error?.message,
+          });
+        }
+      });
 
       // 만료 토큰 정리
       const batch = db.batch();
@@ -80,10 +85,34 @@ exports.sendSOSNotification = onDocumentCreated(
         }
       });
       await batch.commit();
-      await snap.ref.update({ status: "notified", notifiedAt: new Date() });
+      await snap.ref.update({
+        status: "notified",
+        notifiedAt: new Date(),
+        expireAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+      });
 
     } catch (err) {
       console.error("FCM 전송 오류:", err);
     }
   }
 );
+
+exports.cleanupExpiredHomeEvents = onSchedule("every 1 hours", async (event) => {
+  const db = getFirestore();
+  const now = new Date();
+  const q = db.collection("home_events")
+    .where("timestamp", "<=", new Date(Date.now() - 12 * 60 * 60 * 1000))
+    .limit(100);
+
+  let snapshot = await q.get();
+  let deleted = 0;
+  while (!snapshot.empty) {
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    deleted += snapshot.docs.length;
+    snapshot = await q.get();
+  }
+
+  console.log(`cleanupExpiredHomeEvents: deleted ${deleted} expired home_events docs`);
+});
