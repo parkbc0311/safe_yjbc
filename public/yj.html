@@ -525,9 +525,7 @@
     <button class="reg-btn" id="regBtn" onclick="registerToken()">🔔 알림 수신 등록하기</button>
 
     <div class="log-title">bc가 보낸 알림 📬</div>
-    <div class="log-list" id="logList">
-      <div class="log-empty">아직 bc가 집에 간다고 안 했네요 🫠</div>
-    </div>
+    <div class="log-list" id="logList"></div>
   </div>
 
   <!-- Overlays -->
@@ -593,6 +591,7 @@
     );
 
     let firstLoad = true;
+    renderEmpty();
     onSnapshot(q, (snap) => {
       if (!snap.empty) {
         renderLog(snap.docs);
