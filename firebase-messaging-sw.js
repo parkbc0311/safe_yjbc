@@ -4,12 +4,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-com
 
 // ✅ Firebase 설정
 firebase.initializeApp({
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyALUxNcmy9qUxSpVXalATZwqVBKBimziQc",
+  authDomain: "safe-yj.firebaseapp.com",
+  projectId: "safe-yj",
+  storageBucket: "safe-yj.firebasestorage.app",
+  messagingSenderId: "431566844297",
+  appId: "1:431566844297:web:7736c329a53969a96cb158",
+  measurementId: "G-D4VT257P6K"
 });
 
 const messaging = firebase.messaging();
