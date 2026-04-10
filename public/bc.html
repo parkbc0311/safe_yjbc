@@ -359,6 +359,7 @@
     .log-info  { flex: 1; }
     .log-time  { font-size: 0.68rem; color: var(--muted); }
     .log-msg   { font-family: 'Gaegu', cursive; font-size: 0.95rem; color: var(--ink2); margin-top: 1px; }
+    .log-sub   { font-size: 0.82rem; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
     .log-map {
       font-size: 0.72rem;
@@ -549,7 +550,9 @@
       const msg = RECV_MSGS[Math.floor(Math.random() * RECV_MSGS.length)];
       document.getElementById('incomingWho').textContent = msg;
       document.getElementById('incomingDesc').textContent =
-        `📍 ${Number(data.latitude).toFixed(4)}, ${Number(data.longitude).toFixed(4)}`;
+        data.address
+          ? `📍 ${data.address} 근처`
+          : `📍 ${Number(data.latitude).toFixed(4)}, ${Number(data.longitude).toFixed(4)}`;
       document.getElementById('incomingMapBtn').href =
         data.mapsUrl || `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
       banner.classList.add('show');
@@ -566,11 +569,15 @@
         const timeStr = t.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const el = document.createElement('div');
         el.className = 'log-item';
+        const locationText = d.address
+          ? `${d.address} 근처`
+          : `위치: ${Number(d.latitude).toFixed(4)}, ${Number(d.longitude).toFixed(4)}`;
         el.innerHTML = `
           <div class="log-emoji">🏠</div>
           <div class="log-info">
             <div class="log-time">${timeStr}</div>
             <div class="log-msg">${d.message || 'yj가 집에 간대요!'}</div>
+            <div class="log-sub">${locationText}</div>
           </div>
           <a class="log-map" href="${d.mapsUrl}" target="_blank">지도 →</a>
         `;
@@ -588,19 +595,21 @@
         const pos = await getGPS();
         const { latitude, longitude } = pos.coords;
         const message = SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+        const address = await reverseGeocode(latitude, longitude);
 
         await addDoc(collection(db, "home_events"), {
           from: MY_USER, to: "yj",
           latitude, longitude,
           accuracy: Math.round(pos.coords.accuracy),
           mapsUrl: `https://maps.google.com/?q=${latitude},${longitude}`,
+          address,
           message,
           timestamp: serverTimestamp()
         });
 
         document.getElementById('sendingOverlay').classList.remove('active');
         document.getElementById('successMsg').innerHTML =
-          `yj한테 알림 보냈어요~<br/><strong style="color:var(--blue-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}</span>`;
+          `yj한테 알림 보냈어요~<br/><strong style="color:var(--blue-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
         document.getElementById('successOverlay').classList.add('active');
         setStatus('success', '전송 완료! ✅');
 
@@ -653,6 +662,28 @@
       const btn = document.getElementById('regBtn');
       btn.textContent = '✅ 알림 등록 완료!';
       btn.classList.add('done');
+    }
+
+    async function reverseGeocode(latitude, longitude) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ko&zoom=16`
+        );
+        if (!res.ok) return null;
+        const data = await res.json();
+        const addr = data.address || {};
+        const parts = [];
+        if (addr.state) parts.push(addr.state);
+        if (addr.city) parts.push(addr.city);
+        else if (addr.county) parts.push(addr.county);
+        if (addr.city_district) parts.push(addr.city_district);
+        else if (addr.suburb) parts.push(addr.suburb);
+        if (addr.neighbourhood) parts.push(addr.neighbourhood);
+        if (addr.road) parts.push(addr.road);
+        return parts.filter(Boolean).join(' ') || data.display_name || null;
+      } catch {
+        return null;
+      }
     }
 
     function getGPS() {

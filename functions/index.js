@@ -31,16 +31,17 @@ exports.sendSOSNotification = onDocumentCreated(
       }
 
       const tokens = tokensSnap.docs.map(d => d.data().token).filter(Boolean);
-      const fromLabel = from === "yj" ? "YJ" : "BC";
+      const fromLabel = from === "yj" ? "연주" : "병철";
       const emoji = from === "yj" ? "🤍" : "💛";
+      const addressText = mapsUrl && mapsUrl.includes('google.com')
+        ? (snap.data().address ? `${snap.data().address} 근처` : `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`)
+        : (snap.data().address ? `${snap.data().address} 근처` : "집에 가는 중이에요");
 
       const message = {
         tokens,
         notification: {
-          title: `${emoji} ${fromLabel}가 호출했어요!`,
-          body: latitude
-            ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`
-            : "긴급 호출이 도착했습니다",
+          title: `${emoji} ${fromLabel}가 집에 간대요`,
+          body: addressText,
         },
         data: {
           sender: from,
@@ -48,9 +49,8 @@ exports.sendSOSNotification = onDocumentCreated(
           latitude: String(latitude ?? ""),
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
-          body: latitude
-            ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`
-            : "긴급 호출이 도착했습니다",
+          address: snap.data().address ?? "",
+          body: addressText,
         },
         webpush: {
           notification: {

@@ -19,8 +19,8 @@ messaging.onBackgroundMessage((payload) => {
   const { sender, receiver, latitude, longitude, mapsUrl, body: messageBody } = payload.data || {};
 
   const TITLES = {
-    yj: "🏃‍♀️ YJ가 집에 간대요!",
-    bc: "🏃‍♂️ BC가 집에 간대요!",
+    yj: "🏃‍♀️ 연주가 집에 간대요!",
+    bc: "🏃‍♂️ 병철이가 집에 간대요!",
   };
 
   const title = TITLES[sender] || "🏠 귀가 알림!";
