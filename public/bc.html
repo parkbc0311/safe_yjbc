@@ -640,7 +640,8 @@
       } catch(e) {
         btn.disabled = false;
         btn.textContent = '🔔 알림 수신 등록하기 (재시도)';
-        setStatus('error', '알림 등록 실패, 콘솔 확인');
+        const message = e?.message || String(e);
+        setStatus('error', `등록 실패: ${message}`);
         console.error('registerToken error', e);
       }
     };
