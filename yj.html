@@ -586,7 +586,7 @@
     // BC가 보낸 이벤트 실시간 감지
     const q = query(
       collection(db, "home_events"),
-      where("from", "==", "bc"),
+      where("to", "==", "bc"),
       orderBy("timestamp", "desc"),
       limit(3)
     );
