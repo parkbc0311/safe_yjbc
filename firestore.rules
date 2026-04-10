@@ -9,7 +9,10 @@ service cloud.firestore {
     match /home_events/{docId} {
       allow create: if true;
       allow read: if true;
-      allow update, delete: if false;
+      // 긴급 업그레이드를 위해 emergency, message 필드 업데이트 허용
+      allow update: if request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['emergency', 'message']);
+      allow delete: if false;
     }
     match /receiver_tokens/{docId} {
       allow read, write: if true;

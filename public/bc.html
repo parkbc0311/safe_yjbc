@@ -663,66 +663,99 @@
       list.innerHTML = `<div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠<br/>BC가 보낸 알림은 yj 페이지에서 보여요.</div>`;
     }
 
-    // ── 연속 클릭 긴급 감지 ──
-    let tapCount = 0;
-    let tapTimer = null;
+    // ── 탭 로직 ──
+    // 1번 탭 → 즉시 일반 전송
+    // 1.5초 안에 5번 연타 → 긴급 전송으로 업그레이드
     const EMERGENCY_TAPS = 5;
-    const TAP_WINDOW_MS = 3000;
+    const TAP_WINDOW_MS = 1500;
+
+    let tapTimes = [];
+    let lastSentDocRef = null;
+    let emergencyUpgraded = false;
 
     window.handleBtnClick = function() {
-      tapCount++;
-      const counter = document.getElementById('tapCounter');
-      const btn = document.getElementById('mainBtn');
-      const emoji = document.getElementById('houseEmoji');
-      const label = document.getElementById('houseLabel');
-      const sublabel = document.getElementById('houseSublabel');
+      const now = Date.now();
 
-      if (tapCount >= 2 && tapCount < EMERGENCY_TAPS) {
-        counter.textContent = tapCount;
-        counter.classList.add('show');
-        btn.className = 'house-btn emergency-' + (tapCount <= 3 ? '1' : '2');
-        setStatus('loading', `${EMERGENCY_TAPS - tapCount}번 더 누르면 긴급 호출! 🚨`);
+      tapTimes = tapTimes.filter(t => now - t < TAP_WINDOW_MS);
+      tapTimes.push(now);
+
+      const count = tapTimes.length;
+
+      // 첫 번째 탭 → 즉시 일반 전송
+      if (count === 1) {
+        emergencyUpgraded = false;
+        lastSentDocRef = null;
+        sendGoHome(false);
+        return;
       }
 
-      clearTimeout(tapTimer);
-      tapTimer = setTimeout(() => {
-        if (tapCount > 0 && tapCount < EMERGENCY_TAPS) {
-          sendGoHome(false);
-        }
-        resetTapState();
-      }, TAP_WINDOW_MS);
+      // 2~4번 연타 중 → 시각적 피드백만
+      if (count >= 2 && count < EMERGENCY_TAPS) {
+        const btn = document.getElementById('mainBtn');
+        const counter = document.getElementById('tapCounter');
+        counter.textContent = count;
+        counter.classList.add('show');
+        btn.className = 'house-btn ' + (count <= 3 ? 'emergency-1' : 'emergency-2');
+        setStatus('loading', `🚨 ${EMERGENCY_TAPS - count}번 더! 긴급 호출로 바뀌어요!`);
+        return;
+      }
 
-      if (tapCount >= EMERGENCY_TAPS) {
-        clearTimeout(tapTimer);
+      // 5번 연타 달성 → 긴급 업그레이드!
+      if (count >= EMERGENCY_TAPS && !emergencyUpgraded) {
+        emergencyUpgraded = true;
+        tapTimes = [];
+
+        const btn = document.getElementById('mainBtn');
+        const emoji = document.getElementById('houseEmoji');
+        const label = document.getElementById('houseLabel');
+        const sublabel = document.getElementById('houseSublabel');
+        const counter = document.getElementById('tapCounter');
+
         btn.className = 'house-btn emergency-3';
         emoji.textContent = '🚨';
         label.textContent = '긴급 호출!!';
-        sublabel.textContent = '전송 중...';
+        sublabel.textContent = '업그레이드 중...';
         counter.classList.remove('show');
-        setStatus('error', '🚨 긴급 호출 전송 중!');
-        sendGoHome(true);
-        setTimeout(resetTapState, 5000);
+        setStatus('error', '🚨 긴급 호출로 업그레이드!');
+
+        upgradeToEmergency();
       }
     };
 
-    function resetTapState() {
-      tapCount = 0;
-      clearTimeout(tapTimer);
-      const btn = document.getElementById('mainBtn');
-      const emoji = document.getElementById('houseEmoji');
-      const label = document.getElementById('houseLabel');
-      const sublabel = document.getElementById('houseSublabel');
-      const counter = document.getElementById('tapCounter');
-      btn.className = 'house-btn';
-      emoji.textContent = '🏠';
-      label.textContent = '집에 간다!';
-      sublabel.textContent = 'tap!';
-      counter.classList.remove('show');
+    async function upgradeToEmergency() {
+      try {
+        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+        if (lastSentDocRef) {
+          await updateDoc(lastSentDocRef, {
+            emergency: true,
+            message: '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!'
+          });
+          setStatus('error', '🚨 긴급 호출 완료!');
+        } else {
+          await sendGoHome(true);
+        }
+      } catch(e) {
+        console.error('긴급 업그레이드 실패', e);
+        await sendGoHome(true);
+      }
+
+      setTimeout(() => {
+        const btn = document.getElementById('mainBtn');
+        const emoji = document.getElementById('houseEmoji');
+        const label = document.getElementById('houseLabel');
+        const sublabel = document.getElementById('houseSublabel');
+        btn.className = 'house-btn';
+        emoji.textContent = '🏠';
+        label.textContent = '집에 간다!';
+        sublabel.textContent = 'tap!';
+        emergencyUpgraded = false;
+        lastSentDocRef = null;
+        setStatus('', '대기 중 ☁️');
+      }, 4000);
     }
 
     async function sendGoHome(isEmergency = false) {
-      const btn = document.getElementById('mainBtn');
-      btn.disabled = true;
       if (!isEmergency) {
         document.getElementById('sendingOverlay').classList.add('active');
         setStatus('loading', 'GPS 찍는 중... 🛰️');
@@ -736,7 +769,7 @@
           : SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
         const address = await reverseGeocode(latitude, longitude);
 
-        await addDoc(collection(db, "home_events"), {
+        const docRef = await addDoc(collection(db, "home_events"), {
           from: MY_USER, to: "yj",
           latitude, longitude,
           accuracy: Math.round(pos.coords.accuracy),
@@ -746,6 +779,8 @@
           emergency: isEmergency,
           timestamp: serverTimestamp()
         });
+
+        if (!isEmergency) lastSentDocRef = docRef;
 
         document.getElementById('sendingOverlay').classList.remove('active');
 
@@ -761,13 +796,11 @@
 
         setTimeout(() => {
           document.getElementById('successOverlay').classList.remove('active');
-          btn.disabled = false;
           setStatus('', '대기 중 ☁️');
         }, 5000);
 
       } catch(e) {
         document.getElementById('sendingOverlay').classList.remove('active');
-        btn.disabled = false;
         if (e.code === 1) setStatus('error', '📍 위치 권한 허용해주세요!');
         else setStatus('error', '전송 실패... 다시 눌러봐요 🥲');
         console.error(e);
