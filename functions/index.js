@@ -2,6 +2,7 @@
 // 양방향 SOS - yj ↔ bc
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -75,10 +76,34 @@ exports.sendSOSNotification = onDocumentCreated(
         }
       });
       await batch.commit();
-      await snap.ref.update({ status: "notified", notifiedAt: new Date() });
+      await snap.ref.update({
+        status: "notified",
+        notifiedAt: new Date(),
+        expireAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+      });
 
     } catch (err) {
       console.error("FCM 전송 오류:", err);
     }
   }
 );
+
+exports.cleanupExpiredHomeEvents = onSchedule("every 1 hours", async (event) => {
+  const db = getFirestore();
+  const now = new Date();
+  const q = db.collection("home_events")
+    .where("timestamp", "<=", new Date(Date.now() - 12 * 60 * 60 * 1000))
+    .limit(100);
+
+  let snapshot = await q.get();
+  let deleted = 0;
+  while (!snapshot.empty) {
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    deleted += snapshot.docs.length;
+    snapshot = await q.get();
+  }
+
+  console.log(`cleanupExpiredHomeEvents: deleted ${deleted} expired home_events docs`);
+});
