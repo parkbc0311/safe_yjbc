@@ -630,6 +630,7 @@
         if (perm !== 'granted') throw new Error('권한 거부');
         const sw = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
         const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
+        console.log('FCM token registered', { user: MY_USER, token, sw });
         await addDoc(collection(db, "receiver_tokens"), {
           user: MY_USER, token, registeredAt: new Date().toISOString()
         });
@@ -639,7 +640,8 @@
       } catch(e) {
         btn.disabled = false;
         btn.textContent = '🔔 알림 수신 등록하기 (재시도)';
-        console.error(e);
+        setStatus('error', '알림 등록 실패, 콘솔 확인');
+        console.error('registerToken error', e);
       }
     };
 
