@@ -521,9 +521,8 @@
         <circle class="fill-ring" cx="97" cy="97" r="80" id="pressFill"/>
       </svg>
       <button class="house-btn" id="mainBtn"
-        onclick="onTap()"
-        onmousedown="onPressStart()" onmouseup="onPressEnd()" onmouseleave="onPressEnd()"
-        ontouchstart="onPressStart(event)" ontouchend="onPressEnd()" ontouchcancel="onPressEnd()">
+        onmousedown="onPressStart()"
+        ontouchstart="onPressStart(event)">
         <span class="house-emoji" id="btnEmoji">🏠</span>
         <span class="house-label" id="btnLabel">집에 간다!</span>
         <span class="house-sublabel" id="btnSub">꾹 → 긴급!</span>
@@ -673,14 +672,6 @@
       list.innerHTML = `<div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠<br/>BC가 보낸 알림은 yj 페이지에서 보여요.</div>`;
     }
 
-    // ── 탭: 즉시 일반 전송 ──
-    window.onTap = function() {
-      // if (isPressed) return;
-        if (Date.now() - lpStart < 200) {
-        doSend(false);
-        }
-    };
-
     // ── 롱프레스: 5초 꾹 → 긴급 ──
     const LP_MS = 5000;
     const CIRC = 2 * Math.PI * 80; // ≈ 502.65
@@ -740,12 +731,24 @@
 
     window.onPressEnd = function() {
       if (!isPressed) return;
+
       isPressed = false;
       cancelAnimationFrame(lpRaf);
-      const elapsed = Date.now() - lpStart;
-      if (elapsed < LP_MS) { resetBtn(); setStatus('', '대기 중 ☁️'); }
-    };
 
+      const elapsed = Date.now() - lpStart;
+
+      // ✅ 5초 전에 떼면 → 일반 메시지 전송
+      if (elapsed < LP_MS) {
+        resetBtn();
+        doSend(false);   // ⭐ 이게 핵심
+        setStatus('loading', '전송 중... 🚀');
+      }
+    };
+          // 🔥 손을 어디서 떼든 무조건 감지
+      window.addEventListener('mouseup', onPressEnd);
+      window.addEventListener('touchend', onPressEnd);
+      window.addEventListener('touchcancel', onPressEnd);
+      
     function resetBtn() {
       document.getElementById('mainBtn').className = 'house-btn';
       document.getElementById('btnEmoji').textContent = '🏠';
