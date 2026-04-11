@@ -419,41 +419,66 @@
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* ── 긴급 모드 스타일 ── */
-    .house-btn.emergency-1 { background: linear-gradient(145deg, #A8D8FF, #4A9EE8, #FF8C8C); }
-    .house-btn.emergency-2 { background: linear-gradient(145deg, #FF8C8C, #FF4444, #CC0000); box-shadow: 0 8px 0 #8B0000, 0 12px 30px rgba(255,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.4); }
-    .house-btn.emergency-3 {
-      background: linear-gradient(145deg, #FF4444, #CC0000, #880000);
-      box-shadow: 0 8px 0 #550000, 0 12px 40px rgba(255,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3);
-      animation: emergencyPulse 0.5s ease-in-out infinite;
+    /* ── 롱프레스 긴급 모드 스타일 ── */
+
+    .press-progress {
+      position: absolute;
+      inset: -10px;
+      width: calc(100% + 20px);
+      height: calc(100% + 20px);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      transform: rotate(-90deg);
     }
-    @keyframes emergencyPulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 8px 0 #550000, 0 12px 40px rgba(255,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.3); }
-      50%       { transform: scale(1.04); box-shadow: 0 8px 0 #550000, 0 16px 60px rgba(255,0,0,0.7), inset 0 2px 0 rgba(255,255,255,0.3); }
+    .press-progress.active { opacity: 1; }
+    .press-progress circle { fill: none; stroke-width: 5; stroke-linecap: round; }
+    .press-progress .track { stroke: rgba(255,80,0,0.15); }
+    .press-progress .fill  {
+      stroke: #FF3300;
+      stroke-dasharray: 502;
+      stroke-dashoffset: 502;
+      transition: stroke-dashoffset linear, stroke 0.3s;
     }
 
-    .tap-counter {
-      position: absolute;
-      top: -12px; right: -8px;
-      background: #FF2222;
-      color: white;
-      font-family: 'Gaegu', cursive;
-      font-size: 0.85rem;
-      font-weight: 700;
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid white;
-      box-shadow: 0 2px 8px rgba(255,0,0,0.4);
-      animation: popIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
-      z-index: 10;
+    .house-btn.lp-1 {
+      background: linear-gradient(145deg, #A8D8FF, #FFAA55, #FF8855) !important;
+      box-shadow: 0 8px 0 #CC5500, 0 12px 30px rgba(255,100,0,0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
     }
-    .tap-counter.show { display: flex; }
-    @keyframes popIn {
-      from { transform: scale(0); }
-      to   { transform: scale(1); }
+    .house-btn.lp-2 {
+      background: linear-gradient(145deg, #FF7744, #FF3311, #CC1100) !important;
+      box-shadow: 0 8px 0 #991100, 0 12px 40px rgba(255,50,0,0.4), inset 0 2px 0 rgba(255,255,255,0.4) !important;
+      animation: lpShake1 0.35s ease-in-out infinite !important;
+    }
+    .house-btn.lp-3 {
+      background: linear-gradient(145deg, #FF2200, #BB0000, #770000) !important;
+      box-shadow: 0 8px 0 #550000, 0 12px 55px rgba(255,0,0,0.55), inset 0 2px 0 rgba(255,255,255,0.3) !important;
+      animation: lpShake2 0.2s ease-in-out infinite !important;
+    }
+    .house-btn.lp-done {
+      background: linear-gradient(145deg, #FF0000, #990000, #550000) !important;
+      box-shadow: 0 3px 0 #330000, 0 6px 70px rgba(255,0,0,0.85), inset 0 2px 0 rgba(255,255,255,0.15) !important;
+      animation: lpExplode 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards !important;
+    }
+
+    @keyframes lpShake1 {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      30%       { transform: translateX(-4px) rotate(-1.5deg); }
+      70%       { transform: translateX(4px) rotate(1.5deg); }
+    }
+    @keyframes lpShake2 {
+      0%, 100% { transform: translateX(0) rotate(0deg) scale(1); }
+      20%       { transform: translateX(-6px) rotate(-2.5deg) scale(1.02); }
+      40%       { transform: translateX(6px) rotate(2.5deg) scale(1.025); }
+      60%       { transform: translateX(-5px) rotate(-2deg) scale(1.03); }
+      80%       { transform: translateX(5px) rotate(2deg) scale(1.03); }
+    }
+    @keyframes lpExplode {
+      0%   { transform: scale(0.88) rotate(-3deg); }
+      40%  { transform: scale(1.15) rotate(2deg); }
+      70%  { transform: scale(0.97) rotate(-1deg); }
+      100% { transform: scale(1) rotate(0deg); }
     }
 
     .incoming-banner.emergency {
@@ -504,11 +529,17 @@
     <div class="house-btn-wrap">
       <div class="bounce-ring"></div>
       <div class="bounce-ring"></div>
-      <div class="tap-counter" id="tapCounter">1</div>
-      <button class="house-btn" id="mainBtn" onclick="handleBtnClick()">
+      <svg class="press-progress" id="pressProgress" viewBox="0 0 192 192">
+        <circle class="track" cx="96" cy="96" r="80"/>
+        <circle class="fill"  cx="96" cy="96" r="80" id="pressFill"/>
+      </svg>
+      <button class="house-btn" id="mainBtn"
+        onclick="handleTap()"
+        onmousedown="startLongPress()" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()"
+        ontouchstart="startLongPress(event)" ontouchend="cancelLongPress()" ontouchcancel="cancelLongPress()">
         <span class="house-emoji" id="houseEmoji">🏠</span>
         <span class="house-label" id="houseLabel">집에 간다!</span>
-        <span class="house-sublabel" id="houseSublabel">tap!</span>
+        <span class="house-sublabel" id="houseSublabel">꾹 누르면 긴급!</span>
       </button>
     </div>
     <div class="to-label">→ <strong>yj</strong> 에게 알림 전송</div>
@@ -877,4 +908,113 @@
     }
   </script>
 </body>
-</html>
+</html>    // ── 탭: 즉시 일반 전송 ──
+    window.handleTap = function() {
+      if (isLongPressing) return;
+      sendGoHome(false);
+    };
+
+    // ── 롱프레스: 5초 꾹 → 긴급 전송 ──
+    const LONG_PRESS_MS = 5000;
+    let lpRafId = null;
+    let lpStartTime = null;
+    let isLongPressing = false;
+
+    const CIRCUMFERENCE = 2 * Math.PI * 80;
+
+    window.startLongPress = function(e) {
+      if (e && e.cancelable) e.preventDefault();
+      isLongPressing = true;
+      lpStartTime = Date.now();
+
+      const progress = document.getElementById('pressProgress');
+      const fill = document.getElementById('pressFill');
+      const btn = document.getElementById('mainBtn');
+      const emoji = document.getElementById('houseEmoji');
+      const label = document.getElementById('houseLabel');
+      const sublabel = document.getElementById('houseSublabel');
+
+      fill.style.strokeDashoffset = CIRCUMFERENCE;
+      progress.classList.add('active');
+
+      function tick() {
+        const elapsed = Date.now() - lpStartTime;
+        const ratio = Math.min(elapsed / LONG_PRESS_MS, 1);
+        fill.style.strokeDashoffset = CIRCUMFERENCE * (1 - ratio);
+        const g = Math.round(120 * (1 - ratio));
+        fill.style.stroke = `rgb(255,${g},0)`;
+
+        if (ratio < 0.33) {
+          btn.className = 'house-btn lp-1';
+          emoji.textContent = '😰';
+          label.textContent = '꾹 누르는 중...';
+          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초 더!`;
+          setStatus('loading', '⚠️ 꾹 누르면 긴급 호출!');
+        } else if (ratio < 0.66) {
+          btn.className = 'house-btn lp-2';
+          emoji.textContent = '😱';
+          label.textContent = '긴급 충전 중!!';
+          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초 더!!`;
+          setStatus('error', '🚨 거의 다 됐어요!!');
+        } else {
+          btn.className = 'house-btn lp-3';
+          emoji.textContent = '🚨';
+          label.textContent = '긴급 발동!!!';
+          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초!!!`;
+          setStatus('error', '🚨🚨 손 떼지 마세요!!!');
+        }
+
+        if (ratio < 1) {
+          lpRafId = requestAnimationFrame(tick);
+        } else {
+          cancelAnimationFrame(lpRafId);
+          triggerEmergency();
+        }
+      }
+
+      lpRafId = requestAnimationFrame(tick);
+    };
+
+    window.cancelLongPress = function() {
+      if (!isLongPressing) return;
+      isLongPressing = false;
+      cancelAnimationFrame(lpRafId);
+      const elapsed = Date.now() - lpStartTime;
+      if (elapsed < LONG_PRESS_MS) {
+        resetBtnState();
+        setStatus('', '대기 중 ☁️');
+      }
+    };
+
+    function triggerEmergency() {
+      isLongPressing = false;
+      const btn = document.getElementById('mainBtn');
+      const emoji = document.getElementById('houseEmoji');
+      const label = document.getElementById('houseLabel');
+      const sublabel = document.getElementById('houseSublabel');
+      const progress = document.getElementById('pressProgress');
+      btn.className = 'house-btn lp-done';
+      emoji.textContent = '🚨';
+      label.textContent = '긴급 호출!!';
+      sublabel.textContent = '전송 중...';
+      progress.classList.remove('active');
+      if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+      sendGoHome(true);
+      setTimeout(resetBtnState, 5000);
+    }
+
+    function resetBtnState() {
+      const btn = document.getElementById('mainBtn');
+      const emoji = document.getElementById('houseEmoji');
+      const label = document.getElementById('houseLabel');
+      const sublabel = document.getElementById('houseSublabel');
+      const progress = document.getElementById('pressProgress');
+      btn.className = 'house-btn';
+      emoji.textContent = '🏠';
+      label.textContent = '집에 간다!';
+      sublabel.textContent = '꾹 누르면 긴급!';
+      progress.classList.remove('active');
+      document.getElementById('pressFill').style.strokeDashoffset = CIRCUMFERENCE;
+    }
+
+
