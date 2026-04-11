@@ -419,84 +419,69 @@
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* ── 롱프레스 긴급 모드 스타일 ── */
-
+    /* ── 롱프레스 긴급 모드 ── */
     .press-progress {
       position: absolute;
-      inset: -10px;
-      width: calc(100% + 20px);
-      height: calc(100% + 20px);
-      border-radius: 50%;
+      width: 194px; height: 194px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-90deg);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.2s;
-      transform: rotate(-90deg);
     }
     .press-progress.active { opacity: 1; }
-    .press-progress circle { fill: none; stroke-width: 5; stroke-linecap: round; }
-    .press-progress .track { stroke: rgba(255,80,0,0.15); }
-    .press-progress .fill  {
-      stroke: #FF3300;
-      stroke-dasharray: 502;
-      stroke-dashoffset: 502;
-      transition: stroke-dashoffset linear, stroke 0.3s;
+    .press-progress circle { fill: none; stroke-width: 6; stroke-linecap: round; }
+    .press-progress .bg-ring { stroke: rgba(255,100,0,0.15); }
+    .press-progress .fill-ring {
+      stroke: #FF4400;
+      stroke-dasharray: 503;
+      stroke-dashoffset: 503;
     }
-
     .house-btn.lp-1 {
-      background: linear-gradient(145deg, #A8D8FF, #FFAA55, #FF8855) !important;
-      box-shadow: 0 8px 0 #CC5500, 0 12px 30px rgba(255,100,0,0.25), inset 0 2px 0 rgba(255,255,255,0.5) !important;
+      background: linear-gradient(145deg, #FFD166, #FFAA55, #FF7733) !important;
+      box-shadow: 0 8px 0 #BB4400, 0 12px 30px rgba(255,100,0,0.3), inset 0 2px 0 rgba(255,255,255,0.5) !important;
     }
     .house-btn.lp-2 {
-      background: linear-gradient(145deg, #FF7744, #FF3311, #CC1100) !important;
-      box-shadow: 0 8px 0 #991100, 0 12px 40px rgba(255,50,0,0.4), inset 0 2px 0 rgba(255,255,255,0.4) !important;
-      animation: lpShake1 0.35s ease-in-out infinite !important;
+      background: linear-gradient(145deg, #FF7733, #FF3300, #CC1100) !important;
+      box-shadow: 0 8px 0 #881100, 0 12px 40px rgba(255,40,0,0.45), inset 0 2px 0 rgba(255,255,255,0.4) !important;
+      animation: lpShake 0.3s ease-in-out infinite !important;
     }
     .house-btn.lp-3 {
       background: linear-gradient(145deg, #FF2200, #BB0000, #770000) !important;
-      box-shadow: 0 8px 0 #550000, 0 12px 55px rgba(255,0,0,0.55), inset 0 2px 0 rgba(255,255,255,0.3) !important;
-      animation: lpShake2 0.2s ease-in-out infinite !important;
+      box-shadow: 0 8px 0 #440000, 0 8px 60px rgba(255,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.3) !important;
+      animation: lpShakeFast 0.18s ease-in-out infinite !important;
     }
     .house-btn.lp-done {
-      background: linear-gradient(145deg, #FF0000, #990000, #550000) !important;
-      box-shadow: 0 3px 0 #330000, 0 6px 70px rgba(255,0,0,0.85), inset 0 2px 0 rgba(255,255,255,0.15) !important;
-      animation: lpExplode 0.45s cubic-bezier(0.34,1.56,0.64,1) forwards !important;
+      background: linear-gradient(145deg, #FF0000, #880000) !important;
+      box-shadow: 0 3px 0 #330000, 0 4px 80px rgba(255,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+      animation: lpBoom 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards !important;
     }
-
-    @keyframes lpShake1 {
-      0%, 100% { transform: translateX(0) rotate(0deg); }
-      30%       { transform: translateX(-4px) rotate(-1.5deg); }
-      70%       { transform: translateX(4px) rotate(1.5deg); }
+    @keyframes lpShake {
+      0%,100% { transform: translateX(0); }
+      33%      { transform: translateX(-4px) rotate(-1deg); }
+      66%      { transform: translateX(4px)  rotate(1deg); }
     }
-    @keyframes lpShake2 {
-      0%, 100% { transform: translateX(0) rotate(0deg) scale(1); }
-      20%       { transform: translateX(-6px) rotate(-2.5deg) scale(1.02); }
-      40%       { transform: translateX(6px) rotate(2.5deg) scale(1.025); }
-      60%       { transform: translateX(-5px) rotate(-2deg) scale(1.03); }
-      80%       { transform: translateX(5px) rotate(2deg) scale(1.03); }
+    @keyframes lpShakeFast {
+      0%,100% { transform: translateX(0) scale(1); }
+      25%      { transform: translateX(-6px) rotate(-2deg) scale(1.02); }
+      50%      { transform: translateX(6px)  rotate(2deg)  scale(1.03); }
+      75%      { transform: translateX(-5px) rotate(-1.5deg) scale(1.02); }
     }
-    @keyframes lpExplode {
-      0%   { transform: scale(0.88) rotate(-3deg); }
-      40%  { transform: scale(1.15) rotate(2deg); }
-      70%  { transform: scale(0.97) rotate(-1deg); }
-      100% { transform: scale(1) rotate(0deg); }
+    @keyframes lpBoom {
+      0%   { transform: scale(0.9);  }
+      45%  { transform: scale(1.14); }
+      70%  { transform: scale(0.97); }
+      100% { transform: scale(1);    }
     }
-
+    /* 긴급 수신 배너 */
     .incoming-banner.emergency {
-      background: linear-gradient(135deg, #FF2222, #CC0000) !important;
-      border-bottom-color: #880000 !important;
-      animation: emergencyBannerFlash 0.4s ease-in-out 3;
+      background: linear-gradient(135deg, #EE1111, #AA0000) !important;
+      border-bottom-color: #770000 !important;
     }
-    @keyframes emergencyBannerFlash {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.7; }
-    }
-    .incoming-banner.emergency .incoming-who { color: white !important; }
-    .incoming-banner.emergency .incoming-desc { color: rgba(255,255,255,0.85) !important; }
-
-    .log-item.emergency {
-      border-color: #FF4444;
-      background: #FFF5F5;
-    }
+    .incoming-banner.emergency .incoming-who { color: #fff !important; }
+    .incoming-banner.emergency .incoming-desc { color: rgba(255,255,255,0.82) !important; }
+    /* 긴급 로그 카드 */
+    .log-item.emergency { border-color: #FF4444 !important; background: #FFF5F5 !important; }
   </style>
 </head>
 <body>
@@ -529,17 +514,18 @@
     <div class="house-btn-wrap">
       <div class="bounce-ring"></div>
       <div class="bounce-ring"></div>
-      <svg class="press-progress" id="pressProgress" viewBox="0 0 192 192">
-        <circle class="track" cx="96" cy="96" r="80"/>
-        <circle class="fill"  cx="96" cy="96" r="80" id="pressFill"/>
+      <!-- 롱프레스 원형 프로그레스 -->
+      <svg class="press-progress" id="pressRing" viewBox="0 0 194 194" xmlns="http://www.w3.org/2000/svg">
+        <circle class="bg-ring"   cx="97" cy="97" r="80"/>
+        <circle class="fill-ring" cx="97" cy="97" r="80" id="pressFill"/>
       </svg>
       <button class="house-btn" id="mainBtn"
-        onclick="handleTap()"
-        onmousedown="startLongPress()" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()"
-        ontouchstart="startLongPress(event)" ontouchend="cancelLongPress()" ontouchcancel="cancelLongPress()">
-        <span class="house-emoji" id="houseEmoji">🏠</span>
-        <span class="house-label" id="houseLabel">집에 간다!</span>
-        <span class="house-sublabel" id="houseSublabel">꾹 누르면 긴급!</span>
+        onclick="onTap()"
+        onmousedown="onPressStart()" onmouseup="onPressEnd()" onmouseleave="onPressEnd()"
+        ontouchstart="onPressStart(event)" ontouchend="onPressEnd()" ontouchcancel="onPressEnd()">
+        <span class="house-emoji" id="btnEmoji">🏠</span>
+        <span class="house-label" id="btnLabel">집에 간다!</span>
+        <span class="house-sublabel" id="btnSub">꾹 → 긴급!</span>
       </button>
     </div>
     <div class="to-label">→ <strong>yj</strong> 에게 알림 전송</div>
@@ -635,18 +621,16 @@
     function showIncoming(data) {
       const banner = document.getElementById('incomingBanner');
       const isEmergency = data.emergency === true;
-
       if (isEmergency) {
-        document.getElementById('incomingWho').textContent = '🚨 긴급!! 연주에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!';
         banner.classList.add('emergency');
-        if (navigator.vibrate) navigator.vibrate([500, 100, 500, 100, 500, 100, 500]);
+        document.getElementById('incomingWho').textContent = '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!';
+        if (navigator.vibrate) navigator.vibrate([400,100,400,100,400]);
       } else {
+        banner.classList.remove('emergency');
         const msg = RECV_MSGS[Math.floor(Math.random() * RECV_MSGS.length)];
         document.getElementById('incomingWho').textContent = msg;
-        banner.classList.remove('emergency');
-        if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+        if (navigator.vibrate) navigator.vibrate([200,80,200]);
       }
-
       document.getElementById('incomingDesc').textContent =
         data.address
           ? `📍 ${data.address} 근처`
@@ -654,10 +638,7 @@
       document.getElementById('incomingMapBtn').href =
         data.mapsUrl || `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
       banner.classList.add('show');
-      setTimeout(() => {
-        banner.classList.remove('show');
-        banner.classList.remove('emergency');
-      }, isEmergency ? 20000 : 10000);
+      setTimeout(() => { banner.classList.remove('show'); banner.classList.remove('emergency'); }, isEmergency ? 18000 : 10000);
     }
 
     function renderLog(docs) {
@@ -668,19 +649,16 @@
         const t = d.timestamp?.toDate() || new Date();
         const timeStr = t.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const el = document.createElement('div');
-        const isEmergency = d.emergency === true;
-        el.className = 'log-item' + (isEmergency ? ' emergency' : '');
+        const isEmerg = d.emergency === true;
+        el.className = 'log-item' + (isEmerg ? ' emergency' : '');
         const locationText = d.address
           ? `${d.address} 근처`
           : `위치: ${Number(d.latitude).toFixed(4)}, ${Number(d.longitude).toFixed(4)}`;
-        const msgText = isEmergency
-          ? '🚨 긴급 호출!'
-          : (d.message || 'yj가 집에 간대요!');
         el.innerHTML = `
-          <div class="log-emoji">${isEmergency ? '🚨' : '🏠'}</div>
+          <div class="log-emoji">${isEmerg ? '🚨' : '🏠'}</div>
           <div class="log-info">
             <div class="log-time">${timeStr}</div>
-            <div class="log-msg">${msgText}</div>
+            <div class="log-msg">${d.message || 'yj가 집에 간대요!'}</div>
             <div class="log-sub">${locationText}</div>
           </div>
           <a class="log-map" href="${d.mapsUrl}" target="_blank">지도 →</a>
@@ -694,113 +672,101 @@
       list.innerHTML = `<div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠<br/>BC가 보낸 알림은 yj 페이지에서 보여요.</div>`;
     }
 
-    // ── 탭 로직 ──
-    // 1번 탭 → 즉시 일반 전송
-    // 1.5초 안에 5번 연타 → 긴급 전송으로 업그레이드
-    const EMERGENCY_TAPS = 5;
-    const TAP_WINDOW_MS = 1500;
-
-    let tapTimes = [];
-    let lastSentDocRef = null;
-    let emergencyUpgraded = false;
-
-    window.handleBtnClick = function() {
-      const now = Date.now();
-
-      tapTimes = tapTimes.filter(t => now - t < TAP_WINDOW_MS);
-      tapTimes.push(now);
-
-      const count = tapTimes.length;
-
-      // 첫 번째 탭 → 즉시 일반 전송
-      if (count === 1) {
-        emergencyUpgraded = false;
-        lastSentDocRef = null;
-        sendGoHome(false);
-        return;
-      }
-
-      // 2~4번 연타 중 → 시각적 피드백만
-      if (count >= 2 && count < EMERGENCY_TAPS) {
-        const btn = document.getElementById('mainBtn');
-        const counter = document.getElementById('tapCounter');
-        counter.textContent = count;
-        counter.classList.add('show');
-        btn.className = 'house-btn ' + (count <= 3 ? 'emergency-1' : 'emergency-2');
-        setStatus('loading', `🚨 ${EMERGENCY_TAPS - count}번 더! 긴급 호출로 바뀌어요!`);
-        return;
-      }
-
-      // 5번 연타 달성 → 긴급 업그레이드!
-      if (count >= EMERGENCY_TAPS && !emergencyUpgraded) {
-        emergencyUpgraded = true;
-        tapTimes = [];
-
-        const btn = document.getElementById('mainBtn');
-        const emoji = document.getElementById('houseEmoji');
-        const label = document.getElementById('houseLabel');
-        const sublabel = document.getElementById('houseSublabel');
-        const counter = document.getElementById('tapCounter');
-
-        btn.className = 'house-btn emergency-3';
-        emoji.textContent = '🚨';
-        label.textContent = '긴급 호출!!';
-        sublabel.textContent = '업그레이드 중...';
-        counter.classList.remove('show');
-        setStatus('error', '🚨 긴급 호출로 업그레이드!');
-
-        upgradeToEmergency();
-      }
+    // ── 탭: 즉시 일반 전송 ──
+    window.onTap = function() {
+      if (isPressed) return;
+      doSend(false);
     };
 
-    async function upgradeToEmergency() {
-      try {
-        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    // ── 롱프레스: 5초 꾹 → 긴급 ──
+    const LP_MS = 5000;
+    const CIRC = 2 * Math.PI * 80; // ≈ 502.65
+    let isPressed = false, lpRaf = null, lpStart = null;
 
-        if (lastSentDocRef) {
-          await updateDoc(lastSentDocRef, {
-            emergency: true,
-            message: '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!'
-          });
-          setStatus('error', '🚨 긴급 호출 완료!');
-        } else {
-          await sendGoHome(true);
-        }
-      } catch(e) {
-        console.error('긴급 업그레이드 실패', e);
-        await sendGoHome(true);
+    window.onPressStart = function(e) {
+      if (e && e.cancelable) e.preventDefault();
+      isPressed = true;
+      lpStart = Date.now();
+      document.getElementById('pressRing').classList.add('active');
+      document.getElementById('pressFill').style.strokeDashoffset = CIRC;
+      lpRaf = requestAnimationFrame(lpTick);
+    };
+
+    function lpTick() {
+      const elapsed = Date.now() - lpStart;
+      const ratio   = Math.min(elapsed / LP_MS, 1);
+      const btn     = document.getElementById('mainBtn');
+      const emoji   = document.getElementById('btnEmoji');
+      const label   = document.getElementById('btnLabel');
+      const sub     = document.getElementById('btnSub');
+      const fill    = document.getElementById('pressFill');
+      const secs    = Math.ceil((LP_MS - elapsed) / 1000);
+
+      // 프로그레스 링 업데이트
+      fill.style.strokeDashoffset = CIRC * (1 - ratio);
+      fill.style.stroke = `rgb(255,${Math.round(120 * (1 - ratio))},0)`;
+
+      if (ratio < 0.33) {
+        btn.className = 'house-btn lp-1';
+        emoji.textContent = '😰'; label.textContent = '꾹 누르는 중...'; sub.textContent = `${secs}초 더!`;
+        setStatus('loading', '⚠️ 5초 꾹 누르면 긴급!');
+      } else if (ratio < 0.66) {
+        btn.className = 'house-btn lp-2';
+        emoji.textContent = '😱'; label.textContent = '긴급 충전 중!!'; sub.textContent = `${secs}초 더!!`;
+        setStatus('error', '🚨 거의 다 됐어요!!');
+      } else {
+        btn.className = 'house-btn lp-3';
+        emoji.textContent = '🚨'; label.textContent = '긴급 발동!!!'; sub.textContent = `${secs}초!!!`;
+        setStatus('error', '🚨🚨 손 떼지 마세요!!!');
       }
 
-      setTimeout(() => {
-        const btn = document.getElementById('mainBtn');
-        const emoji = document.getElementById('houseEmoji');
-        const label = document.getElementById('houseLabel');
-        const sublabel = document.getElementById('houseSublabel');
-        btn.className = 'house-btn';
-        emoji.textContent = '🏠';
-        label.textContent = '집에 간다!';
-        sublabel.textContent = 'tap!';
-        emergencyUpgraded = false;
-        lastSentDocRef = null;
-        setStatus('', '대기 중 ☁️');
-      }, 4000);
+      if (ratio < 1) {
+        lpRaf = requestAnimationFrame(lpTick);
+      } else {
+        // 5초 완료!
+        isPressed = false;
+        cancelAnimationFrame(lpRaf);
+        btn.className = 'house-btn lp-done';
+        emoji.textContent = '🚨'; label.textContent = '긴급 호출!!'; sub.textContent = '전송 중...';
+        document.getElementById('pressRing').classList.remove('active');
+        if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+        doSend(true);
+        setTimeout(resetBtn, 5000);
+      }
     }
 
-    async function sendGoHome(isEmergency = false) {
+    window.onPressEnd = function() {
+      if (!isPressed) return;
+      isPressed = false;
+      cancelAnimationFrame(lpRaf);
+      const elapsed = Date.now() - lpStart;
+      if (elapsed < LP_MS) { resetBtn(); setStatus('', '대기 중 ☁️'); }
+    };
+
+    function resetBtn() {
+      document.getElementById('mainBtn').className = 'house-btn';
+      document.getElementById('btnEmoji').textContent = '🏠';
+      document.getElementById('btnLabel').textContent = '집에 간다!';
+      document.getElementById('btnSub').textContent = '꾹 → 긴급!';
+      document.getElementById('pressRing').classList.remove('active');
+      document.getElementById('pressFill').style.strokeDashoffset = CIRC;
+    }
+
+    async function doSend(isEmergency) {
+      const btn = document.getElementById('mainBtn');
       if (!isEmergency) {
+        btn.disabled = true;
         document.getElementById('sendingOverlay').classList.add('active');
         setStatus('loading', 'GPS 찍는 중... 🛰️');
       }
-
       try {
         const pos = await getGPS();
         const { latitude, longitude } = pos.coords;
-        const message = isEmergency
-          ? '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!'
-          : SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
         const address = await reverseGeocode(latitude, longitude);
 
-        const docRef = await addDoc(collection(db, "home_events"), {
+        const emergMsg = '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!';
+        const message = isEmergency ? emergMsg : SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+        await addDoc(collection(db, "home_events"), {
           from: MY_USER, to: "yj",
           latitude, longitude,
           accuracy: Math.round(pos.coords.accuracy),
@@ -811,27 +777,21 @@
           timestamp: serverTimestamp()
         });
 
-        if (!isEmergency) lastSentDocRef = docRef;
-
         document.getElementById('sendingOverlay').classList.remove('active');
-
-        if (isEmergency) {
-          document.getElementById('successMsg').innerHTML =
-            `🚨 <strong style="color:#CC0000">긴급 호출 완료!</strong><br/>yj한테 긴급 알림을 보냈어요!<br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
-        } else {
-          document.getElementById('successMsg').innerHTML =
-            `yj한테 알림 보냈어요~<br/><strong style="color:var(--blue-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
-        }
+        document.getElementById('successMsg').innerHTML =
+          `yj한테 알림 보냈어요~<br/><strong style="color:var(--blue-dark)">${message}</strong><br/><span style="font-size:0.85rem;color:var(--muted)">📍 ${address ? address : `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}</span>`;
         document.getElementById('successOverlay').classList.add('active');
-        setStatus('success', isEmergency ? '🚨 긴급 호출 완료!' : '전송 완료! ✅');
+        setStatus('success', '전송 완료! ✅');
 
         setTimeout(() => {
           document.getElementById('successOverlay').classList.remove('active');
+          if (!isEmergency) btn.disabled = false;
           setStatus('', '대기 중 ☁️');
         }, 5000);
 
       } catch(e) {
         document.getElementById('sendingOverlay').classList.remove('active');
+        if (!isEmergency) btn.disabled = false;
         if (e.code === 1) setStatus('error', '📍 위치 권한 허용해주세요!');
         else setStatus('error', '전송 실패... 다시 눌러봐요 🥲');
         console.error(e);
@@ -908,113 +868,4 @@
     }
   </script>
 </body>
-</html>    // ── 탭: 즉시 일반 전송 ──
-    window.handleTap = function() {
-      if (isLongPressing) return;
-      sendGoHome(false);
-    };
-
-    // ── 롱프레스: 5초 꾹 → 긴급 전송 ──
-    const LONG_PRESS_MS = 5000;
-    let lpRafId = null;
-    let lpStartTime = null;
-    let isLongPressing = false;
-
-    const CIRCUMFERENCE = 2 * Math.PI * 80;
-
-    window.startLongPress = function(e) {
-      if (e && e.cancelable) e.preventDefault();
-      isLongPressing = true;
-      lpStartTime = Date.now();
-
-      const progress = document.getElementById('pressProgress');
-      const fill = document.getElementById('pressFill');
-      const btn = document.getElementById('mainBtn');
-      const emoji = document.getElementById('houseEmoji');
-      const label = document.getElementById('houseLabel');
-      const sublabel = document.getElementById('houseSublabel');
-
-      fill.style.strokeDashoffset = CIRCUMFERENCE;
-      progress.classList.add('active');
-
-      function tick() {
-        const elapsed = Date.now() - lpStartTime;
-        const ratio = Math.min(elapsed / LONG_PRESS_MS, 1);
-        fill.style.strokeDashoffset = CIRCUMFERENCE * (1 - ratio);
-        const g = Math.round(120 * (1 - ratio));
-        fill.style.stroke = `rgb(255,${g},0)`;
-
-        if (ratio < 0.33) {
-          btn.className = 'house-btn lp-1';
-          emoji.textContent = '😰';
-          label.textContent = '꾹 누르는 중...';
-          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초 더!`;
-          setStatus('loading', '⚠️ 꾹 누르면 긴급 호출!');
-        } else if (ratio < 0.66) {
-          btn.className = 'house-btn lp-2';
-          emoji.textContent = '😱';
-          label.textContent = '긴급 충전 중!!';
-          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초 더!!`;
-          setStatus('error', '🚨 거의 다 됐어요!!');
-        } else {
-          btn.className = 'house-btn lp-3';
-          emoji.textContent = '🚨';
-          label.textContent = '긴급 발동!!!';
-          sublabel.textContent = `${Math.ceil((LONG_PRESS_MS - elapsed) / 1000)}초!!!`;
-          setStatus('error', '🚨🚨 손 떼지 마세요!!!');
-        }
-
-        if (ratio < 1) {
-          lpRafId = requestAnimationFrame(tick);
-        } else {
-          cancelAnimationFrame(lpRafId);
-          triggerEmergency();
-        }
-      }
-
-      lpRafId = requestAnimationFrame(tick);
-    };
-
-    window.cancelLongPress = function() {
-      if (!isLongPressing) return;
-      isLongPressing = false;
-      cancelAnimationFrame(lpRafId);
-      const elapsed = Date.now() - lpStartTime;
-      if (elapsed < LONG_PRESS_MS) {
-        resetBtnState();
-        setStatus('', '대기 중 ☁️');
-      }
-    };
-
-    function triggerEmergency() {
-      isLongPressing = false;
-      const btn = document.getElementById('mainBtn');
-      const emoji = document.getElementById('houseEmoji');
-      const label = document.getElementById('houseLabel');
-      const sublabel = document.getElementById('houseSublabel');
-      const progress = document.getElementById('pressProgress');
-      btn.className = 'house-btn lp-done';
-      emoji.textContent = '🚨';
-      label.textContent = '긴급 호출!!';
-      sublabel.textContent = '전송 중...';
-      progress.classList.remove('active');
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
-      sendGoHome(true);
-      setTimeout(resetBtnState, 5000);
-    }
-
-    function resetBtnState() {
-      const btn = document.getElementById('mainBtn');
-      const emoji = document.getElementById('houseEmoji');
-      const label = document.getElementById('houseLabel');
-      const sublabel = document.getElementById('houseSublabel');
-      const progress = document.getElementById('pressProgress');
-      btn.className = 'house-btn';
-      emoji.textContent = '🏠';
-      label.textContent = '집에 간다!';
-      sublabel.textContent = '꾹 누르면 긴급!';
-      progress.classList.remove('active');
-      document.getElementById('pressFill').style.strokeDashoffset = CIRCUMFERENCE;
-    }
-
-
+</html>
