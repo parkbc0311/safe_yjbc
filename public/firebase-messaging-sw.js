@@ -2,7 +2,6 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
-// ✅ Firebase 설정
 firebase.initializeApp({
   apiKey: "AIzaSyALUxNcmy9qUxSpVXalATZwqVBKBimziQc",
   authDomain: "safe-yj.firebaseapp.com",
@@ -15,40 +14,25 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  const { sender, receiver, latitude, longitude, mapsUrl, body: messageBody } = payload.data || {};
+// ✅ onBackgroundMessage는 등록하지 않음
+// Cloud Function의 webpush.notification이 알림을 직접 표시하므로
+// 여기서 showNotification을 추가로 호출하면 이중 알림 발생
 
-  const TITLES = {
-    yj: "🏃‍♀️ 연주가 집에 간대요!",
-    bc: "🏃‍♂️ 병철이가 집에 간대요!",
-  };
-
-  const title = TITLES[sender] || "🏠 귀가 알림!";
-  const body = messageBody || (latitude
-    ? `📍 ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`
-    : "지금 출발했대요!");
-
-  self.registration.showNotification(title, {
-    body,
-    icon: '/icon-192.png',
-    tag: 'home-alert',
-    renotify: true,
-    requireInteraction: false,
-    vibrate: [200, 80, 200],
-    data: { mapsUrl, receiver },
-    actions: [
-      { action: 'open-map', title: '📍 위치 보기' },
-      { action: 'dismiss',  title: '확인 ✓' }
-    ]
-  });
-});
-
+// 알림 클릭 시 앱 열기
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const { mapsUrl, receiver } = event.notification.data || {};
   if (event.action === 'open-map' && mapsUrl) {
     event.waitUntil(clients.openWindow(mapsUrl));
   } else {
-    event.waitUntil(clients.openWindow(`/${receiver}.html`));
+    // 알림 탭 시 해당 유저 페이지 열기
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+        for (const c of list) {
+          if (c.url.includes('.html') && 'focus' in c) return c.focus();
+        }
+        if (receiver) return clients.openWindow(`/${receiver}.html`);
+      })
+    );
   }
 });
