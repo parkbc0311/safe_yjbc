@@ -483,6 +483,57 @@
     .incoming-banner.emergency .incoming-desc { color: rgba(255,255,255,0.82) !important; }
     /* 긴급 로그 카드 */
     .log-item.emergency { border-color: #FF4444 !important; background: #FFF5F5 !important; }
+
+    .eta-wrap {
+      z-index: 1; width: 100%;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      animation: bounceIn 0.85s 0.05s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .eta-hint {
+      font-family: 'Gaegu', cursive; font-size: 0.78rem; color: var(--muted);
+    }
+    .eta-chips {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    }
+    .eta-chip {
+      font-family: 'Gaegu', cursive; font-size: 0.85rem;
+      padding: 6px 12px; border-radius: 100px;
+      border: 2px solid var(--border);
+      background: rgba(255,255,255,0.65); color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-tap-highlight-color: transparent; user-select: none;
+      white-space: nowrap;
+    }
+    .eta-chip:active { transform: scale(0.91); }
+    .eta-chip.on {
+      background: #4A9EE8; border-color: #4A9EE8;
+      color: white; transform: scale(1.07);
+      box-shadow: 0 3px 12px var(--shadow);
+    }
+    .eta-custom-row {
+      display: none; align-items: center; gap: 8px;
+    }
+    .eta-custom-row.show {
+      display: flex;
+      animation: bounceIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .eta-custom-input {
+      font-family: 'Gaegu', cursive; font-size: 1rem;
+      width: 64px; padding: 6px 10px; border-radius: 12px;
+      border: 2px solid var(--border);
+      background: rgba(255,255,255,0.9); color: var(--ink);
+      text-align: center; -webkit-appearance: none;
+    }
+    .eta-custom-input:focus { outline: none; border-color: #4A9EE8; }
+    .eta-unit { font-family: 'Gaegu', cursive; font-size: 0.88rem; color: var(--muted); }
+    .eta-clear {
+      font-family: 'Gaegu', cursive; font-size: 0.75rem; color: var(--muted);
+      background: none; border: none; cursor: pointer; padding: 0;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .eta-clear.show { opacity: 1; pointer-events: auto; }
   </style>
 </head>
 <body>
@@ -529,6 +580,26 @@
       </button>
     </div>
     <div class="to-label">→ <strong>yj</strong> 에게 알림 전송</div>
+  </div>
+
+
+  <div class="eta-wrap">
+    <div class="eta-hint">도착 예정 알려주기 (선택사항 🕐)</div>
+    <div class="eta-chips">
+      <button class="eta-chip" onclick="pickEta(5,  this)">거의 다 왔어요!</button>
+      <button class="eta-chip" onclick="pickEta(30, this)">30분</button>
+      <button class="eta-chip" onclick="pickEta(60, this)">1시간</button>
+      <button class="eta-chip" onclick="pickEta(90, this)">1시간 30분</button>
+      <button class="eta-chip" onclick="pickEta(120,this)">2시간</button>
+      <button class="eta-chip" id="chipCustom" onclick="toggleCustom(this)">직접 입력</button>
+    </div>
+    <div class="eta-custom-row" id="etaCustomRow">
+      <input class="eta-custom-input" id="etaCustomInput"
+        type="number" min="1" max="300" placeholder="분"
+        inputmode="numeric" oninput="onCustomInput(this)"/>
+      <span class="eta-unit">분 후 도착</span>
+    </div>
+    <button class="eta-clear" id="etaClear" onclick="clearEta()">✕ 선택 취소</button>
   </div>
 
   <div class="status-area">
@@ -759,6 +830,71 @@
       document.getElementById('pressFill').style.strokeDashoffset = CIRC;
     }
 
+
+    // ── ETA ──
+    let etaMins = null;
+
+    window.pickEta = function(mins, el) {
+      etaMins = mins;
+      document.querySelectorAll('.eta-chip').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+      document.getElementById('etaCustomRow').classList.remove('show');
+      document.getElementById('etaCustomInput').value = '';
+      document.getElementById('etaClear').classList.add('show');
+      updateBtnLabel();
+    };
+
+    window.toggleCustom = function(el) {
+      const row = document.getElementById('etaCustomRow');
+      const isOpen = row.classList.contains('show');
+      document.querySelectorAll('.eta-chip').forEach(b => b.classList.remove('on'));
+      if (isOpen) {
+        row.classList.remove('show');
+        etaMins = null;
+        document.getElementById('etaClear').classList.remove('show');
+        updateBtnLabel();
+      } else {
+        el.classList.add('on');
+        row.classList.add('show');
+        setTimeout(() => document.getElementById('etaCustomInput').focus(), 50);
+      }
+    };
+
+    window.onCustomInput = function(inp) {
+      const v = parseInt(inp.value);
+      etaMins = (v >= 1 && v <= 300) ? v : null;
+      if (etaMins) document.getElementById('etaClear').classList.add('show');
+      updateBtnLabel();
+    };
+
+    window.clearEta = function() {
+      etaMins = null;
+      document.querySelectorAll('.eta-chip').forEach(b => b.classList.remove('on'));
+      document.getElementById('etaCustomRow').classList.remove('show');
+      document.getElementById('etaCustomInput').value = '';
+      document.getElementById('etaClear').classList.remove('show');
+      updateBtnLabel();
+    };
+
+    function etaLabel(mins) {
+      if (mins === 5)  return '거의 다 왔어요!';
+      if (mins < 60)   return `${mins}분 후 도착`;
+      const h = Math.floor(mins / 60), m = mins % 60;
+      return m ? `${h}시간 ${m}분 후 도착` : `${h}시간 후 도착`;
+    }
+
+    function updateBtnLabel() {
+      const label = document.getElementById('btnLabel');
+      const sub   = document.getElementById('btnSub');
+      if (etaMins) {
+        label.textContent = etaLabel(etaMins);
+        sub.textContent   = '탭해서 전송!';
+      } else {
+        label.textContent = '집에 간다!';
+        sub.textContent   = '꾹 → 긴급!';
+      }
+    }
+
     async function doSend(isEmergency) {
       const btn = document.getElementById('mainBtn');
       if (!isEmergency) {
@@ -772,7 +908,16 @@
         const address = await reverseGeocode(latitude, longitude);
 
         const emergMsg = '🚨 긴급!! 병철이에게 무슨일이 생겼나봐요!! 얼른 전화해보세요!!';
-        const message = isEmergency ? emergMsg : SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+        let message;
+        if (isEmergency) {
+          message = emergMsg;
+        } else if (etaMins) {
+          const etaStr = etaLabel(etaMins);
+          const base = SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+          message = `${base} \n⏱ ${etaStr}`;
+        } else {
+          message = SEND_MSGS[Math.floor(Math.random() * SEND_MSGS.length)];
+        }
         await addDoc(collection(db, "home_events"), {
           from: MY_USER, to: "yj",
           latitude, longitude,
@@ -794,6 +939,7 @@
           document.getElementById('successOverlay').classList.remove('active');
           if (!isEmergency) btn.disabled = false;
           setStatus('', '대기 중 ☁️');
+          clearEta();
         }, 5000);
 
       } catch(e) {
