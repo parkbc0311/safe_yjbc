@@ -731,8 +731,10 @@
 
     // ── 탭: 즉시 일반 전송 ──
     window.onTap = function() {
-      if (isPressed) return;
-      doSend(false);
+      // if (isPressed) return;
+        if (Date.now() - lpStart < 200) {
+        doSend(false);
+        }
     };
 
     // ── 롱프레스: 5초 꾹 → 긴급 ──
