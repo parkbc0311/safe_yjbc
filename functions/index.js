@@ -47,6 +47,12 @@ exports.sendSOSNotification = onDocumentCreated(
 
       const message = {
         tokens,
+        // ✅ notification 블록: iOS가 백그라운드에서 이걸 직접 표시
+        notification: {
+          title: notifTitle,
+          body: notifBody,
+        },
+        // data 블록: 서비스워커/앱에서 추가 처리용
         data: {
           sender: from,
           receiver: to,
@@ -54,9 +60,18 @@ exports.sendSOSNotification = onDocumentCreated(
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
           address: snap.data().address ?? "",
-          emergency: String(isEmergency),   // ← 서비스워커로 전달
+          emergency: String(isEmergency),
           title: notifTitle,
           body: notifBody,
+        },
+        apns: {
+          payload: {
+            aps: {
+              // 긴급은 최고 우선순위 + 화면 켜짐
+              'interruption-level': isEmergency ? 'critical' : 'active',
+              sound: isEmergency ? 'default' : 'default',
+            },
+          },
         },
       };
 

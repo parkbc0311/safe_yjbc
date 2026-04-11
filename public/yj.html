@@ -728,7 +728,7 @@
       list.innerHTML = `<div class="log-empty">아직 bc가 집에 간다고 안 했네요 🫠<br/>YJ가 보낸 알림은 BC 페이지에서 보여요.</div>`;
     }
 
-    // ── 롱프레스: 3초 꾹 → 긴급 ──
+    // ── 롱프레스: 5초 꾹 → 긴급 ──
     const LP_MS = 3000;
     const CIRC = 2 * Math.PI * 80; // ≈ 502.65
     let isPressed = false, lpRaf = null, lpStart = null;
@@ -758,15 +758,15 @@
 
       if (ratio < 0.33) {
         btn.className = 'house-btn lp-1';
-        emoji.textContent = '😰'; label.textContent = '꾹 누르는 중...'; sub.textContent = `${secs}초 더!`;
-        setStatus('loading', '⚠️ 3초 꾹 누르면 긴급!');
+        emoji.textContent = '😤'; label.textContent = '조금만 더!'; sub.textContent = `${secs}초!`;
+        setStatus('loading', '⚠️ 3초 꾹 → 긴급 호출!');
       } else if (ratio < 0.66) {
         btn.className = 'house-btn lp-2';
-        emoji.textContent = '😱'; label.textContent = '긴급 충전 중!!'; sub.textContent = `${secs}초 더!!`;
+        emoji.textContent = '😱'; label.textContent = '거의 다 됐어!!'; sub.textContent = `${secs}초!!`;
         setStatus('error', '🚨 거의 다 됐어요!!');
       } else {
         btn.className = 'house-btn lp-3';
-        emoji.textContent = '🚨'; label.textContent = '긴급 발동!!!'; sub.textContent = `${secs}초!!!`;
+        emoji.textContent = '🚨'; label.textContent = '손 떼지 마!!'; sub.textContent = `${secs}초!!!`;
         setStatus('error', '🚨🚨 손 떼지 마세요!!!');
       }
 
