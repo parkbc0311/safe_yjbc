@@ -748,9 +748,6 @@
       }
     };
           // 🔥 손을 어디서 떼든 무조건 감지
-      window.addEventListener('mouseup', onPressEnd);
-      window.addEventListener('touchend', onPressEnd);
-      window.addEventListener('touchcancel', onPressEnd);
       
     function resetBtn() {
       emergencyFired = false;
@@ -876,6 +873,10 @@
       document.getElementById('statusPill').className = 'status-pill ' + type;
       document.getElementById('statusText').textContent = text;
     }
+    // 전역 손 떼기 감지 (최초 1회만 등록)
+    window.addEventListener('mouseup', onPressEnd);
+    window.addEventListener('touchend', onPressEnd);
+    window.addEventListener('touchcancel', onPressEnd);
   </script>
 </body>
 </html>
