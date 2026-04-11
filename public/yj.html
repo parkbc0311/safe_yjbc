@@ -732,6 +732,7 @@
     const LP_MS = 3000;
     const CIRC = 2 * Math.PI * 80; // ≈ 502.65
     let isPressed = false, lpRaf = null, lpStart = null;
+    let emergencyFired = false; // 긴급 완료 후 onPressEnd 중복 방지
 
     window.onPressStart = function(e) {
       if (e && e.cancelable) e.preventDefault();
@@ -763,17 +764,18 @@
       } else if (ratio < 0.66) {
         btn.className = 'house-btn lp-2';
         emoji.textContent = '😱'; label.textContent = '거의 다 됐어!!'; sub.textContent = `${secs}초!!`;
-        setStatus('error', '🚨 거의 다 됐어요!!');
+        setStatus('error', '🚨 거의 다 됐어!!');
       } else {
         btn.className = 'house-btn lp-3';
         emoji.textContent = '🚨'; label.textContent = '손 떼지 마!!'; sub.textContent = `${secs}초!!!`;
-        setStatus('error', '🚨🚨 손 떼지 마세요!!!');
+        setStatus('error', '🚨🚨 손 떼지 마!!');
       }
 
       if (ratio < 1) {
         lpRaf = requestAnimationFrame(lpTick);
       } else {
-        // 5초 완료!
+        // 3초 완료 → 긴급!
+        emergencyFired = true;
         isPressed = false;
         cancelAnimationFrame(lpRaf);
         btn.className = 'house-btn lp-done';
@@ -781,22 +783,23 @@
         document.getElementById('pressRing').classList.remove('active');
         if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
         doSend(true);
-        setTimeout(resetBtn, 5000);
+        setTimeout(() => { emergencyFired = false; resetBtn(); }, 5000);
       }
     }
 
     window.onPressEnd = function() {
       if (!isPressed) return;
+      if (emergencyFired) return; // 긴급 완료 직후 중복 방지
 
       isPressed = false;
       cancelAnimationFrame(lpRaf);
 
       const elapsed = Date.now() - lpStart;
 
-      // ✅ 5초 전에 떼면 → 일반 메시지 전송
+      // 3초 안에 손 떼면 → 일반 전송
       if (elapsed < LP_MS) {
         resetBtn();
-        doSend(false);   // ⭐ 이게 핵심
+        doSend(false);
         setStatus('loading', '전송 중... 🚀');
       }
     };
@@ -806,6 +809,7 @@
       window.addEventListener('touchcancel', onPressEnd);
 
     function resetBtn() {
+      emergencyFired = false;
       document.getElementById('mainBtn').className = 'house-btn';
       document.getElementById('btnEmoji').textContent = '🏠';
       document.getElementById('btnLabel').textContent = '집에 간다!';

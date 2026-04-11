@@ -47,12 +47,23 @@ exports.sendSOSNotification = onDocumentCreated(
 
       const message = {
         tokens,
-        // ✅ notification 블록: iOS가 백그라운드에서 이걸 직접 표시
-        notification: {
-          title: notifTitle,
-          body: notifBody,
+        // webpush.notification: 웹 푸시에서 알림 제목/내용 직접 지정
+        // → iOS Safari PWA가 이 값을 그대로 표시 (서비스워커 중복 방지)
+        webpush: {
+          notification: {
+            title: notifTitle,
+            body: notifBody,
+            icon: '/icon-192.png',
+            tag: isEmergency ? 'emergency-alert' : 'home-alert',
+            renotify: true,
+            requireInteraction: isEmergency,
+            vibrate: isEmergency ? [400,100,400,100,400] : [200,80,200],
+          },
+          fcmOptions: {
+            link: `/${to}.html`,
+          },
         },
-        // data 블록: 서비스워커/앱에서 추가 처리용
+        // data: 서비스워커에서 추가 처리용 (알림은 webpush가 담당)
         data: {
           sender: from,
           receiver: to,
@@ -63,15 +74,6 @@ exports.sendSOSNotification = onDocumentCreated(
           emergency: String(isEmergency),
           title: notifTitle,
           body: notifBody,
-        },
-        apns: {
-          payload: {
-            aps: {
-              // 긴급은 최고 우선순위 + 화면 켜짐
-              'interruption-level': isEmergency ? 'critical' : 'active',
-              sound: isEmergency ? 'default' : 'default',
-            },
-          },
         },
       };
 
