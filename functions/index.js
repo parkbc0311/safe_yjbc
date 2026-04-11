@@ -17,7 +17,7 @@ exports.sendSOSNotification = onDocumentCreated(
 
     const { from, to, latitude, longitude, mapsUrl, emergency } = snap.data();
     const isEmergency = emergency === true;
-    console.log(`${isEmergency ? '🚨 긴급' : '🏠 귀가'}: ${from} → ${to}`, { latitude, longitude });
+    console.log(`${isEmergency ? '🚨 긴급' : '🏠 귀가'}: ${from} → ${to}`);
 
     try {
       const db = getFirestore();
@@ -32,16 +32,15 @@ exports.sendSOSNotification = onDocumentCreated(
       }
 
       const tokens = tokensSnap.docs.map(d => d.data().token).filter(Boolean);
-      const fromLabel = from === "yj" ? "연주" : "병철";
-      const emoji = from === "yj" ? "🤍" : "💛";
+      const fromLabel = from === "yj" ? "연주" : "병철이";
       const addressText = snap.data().address
         ? `${snap.data().address} 근처`
-        : `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}`;
+        : (latitude ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}` : "집에 가는 중이에요");
 
-      // 긴급 vs 일반 메시지 분기
+      // 긴급 vs 일반 제목/내용 분기
       const notifTitle = isEmergency
-        ? `🚨 긴급!! ${fromLabel}에게 무슨일이 생겼나봐요!!`
-        : `${emoji} ${fromLabel}가 집에 간대요`;
+        ? `🚨🚨 긴급!! ${fromLabel}에게 무슨 일이 생겼나봐요!!`
+        : (from === "yj" ? `🏃‍♀️ 연주가 집에 간대요!` : `🏃‍♂️ 병철이가 집에 간대요!`);
       const notifBody = isEmergency
         ? `얼른 전화해보세요!! 📍 ${addressText}`
         : addressText;
@@ -55,7 +54,7 @@ exports.sendSOSNotification = onDocumentCreated(
           longitude: String(longitude ?? ""),
           mapsUrl: mapsUrl ?? `https://maps.google.com/?q=${latitude},${longitude}`,
           address: snap.data().address ?? "",
-          emergency: String(isEmergency),
+          emergency: String(isEmergency),   // ← 서비스워커로 전달
           title: notifTitle,
           body: notifBody,
         },
