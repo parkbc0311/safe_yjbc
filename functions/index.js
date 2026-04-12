@@ -38,12 +38,21 @@ exports.sendSOSNotification = onDocumentCreated(
         : (latitude ? `위치: ${Number(latitude).toFixed(4)}, ${Number(longitude).toFixed(4)}` : "집에 가는 중이에요");
 
       // 긴급 vs 일반 제목/내용 분기
+      const etaMins = snap.data().etaMins || null;
+      function etaLabel(mins) {
+        if (mins === 5)  return '거의 다 왔어요!';
+        if (mins < 60)   return `${mins}분 후 도착`;
+        const h = Math.floor(mins / 60), m = mins % 60;
+        return m ? `${h}시간 ${m}분 후 도착` : `${h}시간 후 도착`;
+      }
+      const etaStr = etaMins ? ` (⏱ ${etaLabel(etaMins)})` : '';
+
       const notifTitle = isEmergency
         ? `🚨🚨 긴급!! ${fromLabel}에게 무슨 일이 생겼나봐요!!`
         : (from === "yj" ? `🏃‍♀️ 연주가 집에 간대요!` : `🏃‍♂️ 병철이가 집에 간대요!`);
       const notifBody = isEmergency
         ? `얼른 전화해보세요!! 📍 ${addressText}`
-        : addressText;
+        : `${addressText}${etaStr}`;
 
       const message = {
         tokens,

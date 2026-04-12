@@ -42,8 +42,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: env(safe-area-inset-top, 48px) 24px env(safe-area-inset-bottom, 36px);
+      justify-content: flex-start;
+      padding: env(safe-area-inset-top, 48px) 24px 0;
+      height: 100%;
+      overflow: hidden;
       position: relative;
     }
 
@@ -319,9 +321,12 @@
     .bottom-area {
       z-index: 1;
       width: 100%;
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      overflow: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
       animation: bounceIn 1s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
     }
 
@@ -534,6 +539,31 @@
       -webkit-tap-highlight-color: transparent;
     }
     .eta-clear.show { opacity: 1; pointer-events: auto; }
+
+    .log-tabs {
+      display: flex; gap: 6px; flex-shrink: 0;
+    }
+    .log-tab {
+      flex: 1;
+      font-family: 'Gaegu', cursive; font-size: 0.85rem;
+      padding: 7px 10px; border-radius: 12px;
+      border: 2px solid var(--border);
+      background: rgba(255,255,255,0.55); color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+      -webkit-tap-highlight-color: transparent; text-align: center;
+    }
+    .log-tab.active {
+      background: var(--blue); border-color: var(--blue);
+      color: white; box-shadow: 0 3px 10px var(--shadow);
+    }
+    .log-scroll {
+      flex: 1; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex; flex-direction: column; gap: 8px;
+      padding-bottom: 8px;
+    }
+    .log-scroll::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
@@ -611,9 +641,13 @@
 
   <div class="bottom-area">
     <button class="reg-btn" id="regBtn" onclick="registerToken()">🔔 알림 수신 등록하기</button>
-
-    <div class="log-title">yj가 보낸 알림 📬 <span style="font-size:0.8rem;color:var(--muted);display:block;margin-top:4px;">이 페이지는 yj가 BC에게 보낸 알림을 표시해요.</span></div>
-    <div class="log-list" id="logList"></div>
+    <div class="log-tabs">
+      <button class="log-tab active" id="tabRecv" onclick="switchTab('recv')">📬 yj가 보낸 알림</button>
+      <button class="log-tab"        id="tabSent" onclick="switchTab('sent')">📤 내가 보낸 알림</button>
+    </div>
+    <div class="log-scroll" id="logScroll">
+      <div class="log-list" id="logList"></div>
+    </div>
   </div>
 
   <!-- Overlays -->
@@ -674,17 +708,45 @@
       collection(db, "home_events"),
       where("to", "==", "bc"),
       orderBy("timestamp", "desc"),
-      limit(3)
+      limit(10)
     );
+
+
+    // ── 탭 전환 & 내가 보낸 알림 ──
+    let currentTab = 'recv';
+    let sentDocs = [];
+
+    const qSent = query(
+      collection(db, "home_events"),
+      where("from", "==", "bc"),
+      orderBy("timestamp", "desc"),
+      limit(10)
+    );
+    onSnapshot(qSent, (snap) => {
+      sentDocs = snap.docs;
+      if (currentTab === 'sent') renderLogDocs(sentDocs, 'bc');
+    });
+
+    window.switchTab = function(tab) {
+      currentTab = tab;
+      document.getElementById('tabRecv').classList.toggle('active', tab === 'recv');
+      document.getElementById('tabSent').classList.toggle('active', tab === 'sent');
+      if (tab === 'recv') {
+        renderLogDocs(window._recvDocs || [], 'yj');
+      } else {
+        renderLogDocs(sentDocs, 'bc');
+      }
+    };
 
     let firstLoad = true;
     renderEmpty();
     onSnapshot(q, (snap) => {
+      window._recvDocs = snap.docs;
       if (!snap.empty) {
-        renderLog(snap.docs);
+        if (currentTab === 'recv') renderLog(snap.docs);
         if (!firstLoad) showIncoming(snap.docs[0].data());
       } else {
-        renderEmpty();
+        if (currentTab === 'recv') renderEmpty();
       }
       firstLoad = false;
     });
@@ -712,35 +774,45 @@
       setTimeout(() => { banner.classList.remove('show'); banner.classList.remove('emergency'); }, isEmergency ? 18000 : 10000);
     }
 
-    function renderLog(docs) {
+    function renderLogDocs(docs, fromUser) {
       const list = document.getElementById('logList');
       list.innerHTML = '';
+      if (!docs || docs.length === 0) {
+        const emptyMsg = fromUser === 'yj' ? '아직 yj가 집에 간다고 안 했네요 🫠' : '내가 보낸 알림이 없어요 📭';
+        list.innerHTML = `<div class="log-empty">${emptyMsg}</div>`;
+        return;
+      }
       docs.forEach(doc => {
         const d = doc.data();
         const t = d.timestamp?.toDate() || new Date();
         const timeStr = t.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const el = document.createElement('div');
         const isEmerg = d.emergency === true;
+        const isMine  = fromUser === 'bc';
         el.className = 'log-item' + (isEmerg ? ' emergency' : '');
         const locationText = d.address
           ? `${d.address} 근처`
           : `위치: ${Number(d.latitude).toFixed(4)}, ${Number(d.longitude).toFixed(4)}`;
+        const etaBadge = d.etaMins
+          ? `<span style="font-size:0.72rem;color:var(--blue-dark);margin-left:4px;">⏱ ${etaLabel(d.etaMins)}</span>`
+          : '';
         el.innerHTML = `
-          <div class="log-emoji">${isEmerg ? '🚨' : '🏠'}</div>
+          <div class="log-emoji">${isEmerg ? '🚨' : (isMine ? '📤' : '🏠')}</div>
           <div class="log-info">
             <div class="log-time">${timeStr}</div>
-            <div class="log-msg">${d.message || 'yj가 집에 간대요!'}</div>
-            <div class="log-sub">${locationText}</div>
+            <div class="log-msg">${d.message || (isMine ? 'bc가 보낸 알림' : 'yj가 집에 간대요!')}</div>
+            <div class="log-sub">${locationText}${etaBadge}</div>
           </div>
           <a class="log-map" href="${d.mapsUrl}" target="_blank">지도 →</a>
         `;
         list.appendChild(el);
       });
     }
+    function renderLog(docs) { renderLogDocs(docs, 'yj'); }
 
     function renderEmpty() {
       const list = document.getElementById('logList');
-      list.innerHTML = `<div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠<br/>BC가 보낸 알림은 yj 페이지에서 보여요.</div>`;
+      list.innerHTML = `<div class="log-empty">아직 yj가 집에 간다고 안 했네요 🫠</div>`;
     }
 
     // ── 롱프레스: 5초 꾹 → 긴급 ──
@@ -920,6 +992,7 @@
         }
         await addDoc(collection(db, "home_events"), {
           from: MY_USER, to: "yj",
+          etaMins: etaMins || null,
           latitude, longitude,
           accuracy: Math.round(pos.coords.accuracy),
           mapsUrl: `https://maps.google.com/?q=${latitude},${longitude}`,
