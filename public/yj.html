@@ -30,12 +30,15 @@
       --shadow: rgba(212,98,26,0.15);
     }
 
-    html, body {
-      height: 100%; width: 100%;
+    html {
+      height: 100%;
+    }
+    body {
+      min-height: 100%;
+      width: 100%;
       background: var(--peach);
       color: var(--ink);
       font-family: 'Noto Sans KR', sans-serif;
-      overflow: hidden;
     }
 
     body {
@@ -43,12 +46,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: env(safe-area-inset-top, 48px) 24px 0;
+      padding: env(safe-area-inset-top, 48px) 24px env(safe-area-inset-bottom, 24px);
       position: relative;
-      height: 100dvh;
-      overflow-x: hidden;
-      overflow-y: auto;      
-        }
+      gap: 12px;
+    }
 
     /* Dotted background pattern */
     body::before {
@@ -355,13 +356,9 @@
     .bottom-area {
       z-index: 1;
       width: 100%;
-      flex: 1 1 0;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      overflow: hidden;
-      padding-bottom: env(safe-area-inset-bottom, 20px);
       animation: bounceIn 1s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
     }
 
@@ -392,18 +389,12 @@
       box-shadow: 0 3px 10px var(--shadow);
     }
 
-    /* 로그 스크롤 영역 */
+    /* 로그 영역 */
     .log-scroll {
-      flex: 1 1 0;
-      min-height: 0;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding-bottom: 8px;
     }
-    .log-scroll::-webkit-scrollbar { display: none; }
 
     .reg-btn {
       width: 100%;
@@ -953,7 +944,7 @@
       }
     }
 
-    window.onPressEnd = function() {
+    const onPressEnd = window.onPressEnd = function() {
       if (!isPressed) return;
       if (emergencyFired) return; // 긴급 완료 직후 중복 방지
 
