@@ -1,0 +1,123 @@
+[debug] [2026-04-15T14:57:33.497Z] ----------------------------------------------------------------------
+[debug] [2026-04-15T14:57:33.506Z] Command:       /opt/homebrew/Cellar/node/25.9.0_1/bin/node /opt/homebrew/bin/firebase deploy --only functions,hosting
+[debug] [2026-04-15T14:57:33.506Z] CLI Version:   15.14.0
+[debug] [2026-04-15T14:57:33.506Z] Platform:      darwin
+[debug] [2026-04-15T14:57:33.506Z] Node Version:  v25.9.0
+[debug] [2026-04-15T14:57:33.506Z] Time:          Wed Apr 15 2026 23:57:33 GMT+0900 (한국 표준시)
+[debug] [2026-04-15T14:57:33.506Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-15T14:57:33.507Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-04-15T14:57:35.353Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-15T14:57:35.353Z] > authorizing via signed-in user (parkbc0311@gmail.com)
+[debug] [2026-04-15T14:57:35.353Z] [iam] checking project safe-yj for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-04-15T14:57:35.354Z] Checked if tokens are valid: false, expires at: 1776003850778
+[debug] [2026-04-15T14:57:35.354Z] Checked if tokens are valid: false, expires at: 1776003850778
+[debug] [2026-04-15T14:57:35.354Z] > refreshing access token with scopes: []
+[debug] [2026-04-15T14:57:35.355Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-15T14:57:35.355Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-15T14:57:35.552Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-04-15T14:57:35.552Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-15T14:57:35.568Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions [none]
+[debug] [2026-04-15T14:57:35.568Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions  x-goog-user-project=safe-yj
+[debug] [2026-04-15T14:57:35.568Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-04-15T14:57:35.733Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-04-15T14:57:35.733Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-04-15T14:57:35.806Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions 200
+[debug] [2026-04-15T14:57:35.806Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-04-15T14:57:35.806Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:35.806Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:35.807Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/safe-yj/serviceAccounts/safe-yj@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-04-15T14:57:35.807Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/safe-yj/serviceAccounts/safe-yj@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-04-15T14:57:36.880Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/safe-yj/serviceAccounts/safe-yj@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2026-04-15T14:57:36.881Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/safe-yj/serviceAccounts/safe-yj@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-04-15T14:57:36.883Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:36.883Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:36.883Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj [none]
+[debug] [2026-04-15T14:57:37.362Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj 200
+[debug] [2026-04-15T14:57:37.362Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj {"projectId":"safe-yj","projectNumber":"431566844297","displayName":"safe-yjbc","name":"projects/safe-yj","resources":{"hostingSite":"safe-yj"},"state":"ACTIVE","etag":"1_9b240aa7-6f09-4829-bb79-69989e604a0b"}
+[info] 
+[info] === Deploying to 'safe-yj'...
+[info] 
+[info] i  deploying functions, hosting 
+[debug] [2026-04-15T14:57:37.370Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:37.370Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:37.370Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj [none]
+[debug] [2026-04-15T14:57:37.571Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj 200
+[debug] [2026-04-15T14:57:37.572Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj {"projectNumber":"431566844297","projectId":"safe-yj","lifecycleState":"ACTIVE","name":"safe-yjbc","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2026-04-10T04:21:25.335Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2026-04-15T14:57:37.575Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:37.575Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:37.575Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj/adminSdkConfig [none]
+[debug] [2026-04-15T14:57:38.007Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj/adminSdkConfig 200
+[debug] [2026-04-15T14:57:38.007Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/safe-yj/adminSdkConfig {"projectId":"safe-yj","storageBucket":"safe-yj.firebasestorage.app"}
+[debug] [2026-04-15T14:57:38.008Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:38.008Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:38.008Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/safe-yj/configs [none]
+[debug] [2026-04-15T14:57:39.062Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/safe-yj/configs 200
+[debug] [2026-04-15T14:57:39.062Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/safe-yj/configs {}
+[debug] [2026-04-15T14:57:39.065Z] Validating nodejs source
+[warn] ⚠  functions: Runtime Node.js 20 will be deprecated on 2026-04-30 and will be decommissioned on 2026-10-30, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy 
+[debug] [2026-04-15T14:57:40.320Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.4.1"
+  },
+  "private": true
+}
+[debug] [2026-04-15T14:57:40.321Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2026-04-15T14:57:40.324Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-15T14:57:40.334Z] Found firebase-functions binary at '/Users/bcpark/Desktop/git_rep/safe_yjbc/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8859
+
+[debug] [2026-04-15T14:57:41.009Z] Got response from /__/functions.yaml {"endpoints":{"sendSOSNotification":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"home_events/{docId}"},"retry":false},"entryPoint":"sendSOSNotification"},"cleanupExpiredHomeEvents":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"scheduleTrigger":{"schedule":"every 1 hours","retryConfig":{"retryCount":null,"maxDoublings":null,"maxRetrySeconds":null,"minBackoffSeconds":null,"maxBackoffSeconds":null},"timeZone":null},"entryPoint":"cleanupExpiredHomeEvents"}},"specVersion":"v1alpha1","requiredAPIs":[{"api":"cloudscheduler.googleapis.com","reason":"Needed for scheduled functions."}],"extensions":{}}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2026-04-15T14:57:45.200Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-15T14:57:45.204Z] > authorizing via signed-in user (parkbc0311@gmail.com)
+[debug] [2026-04-15T14:57:45.204Z] [iam] checking project safe-yj for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2026-04-15T14:57:45.208Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:45.209Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:45.210Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions [none]
+[debug] [2026-04-15T14:57:45.210Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions  x-goog-user-project=safe-yj
+[debug] [2026-04-15T14:57:45.210Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-04-15T14:57:45.488Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions 200
+[debug] [2026-04-15T14:57:45.488Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/safe-yj:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-04-15T14:57:45.489Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:45.489Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:45.490Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/safe-yj/instances pageSize=100&pageToken=
+[debug] [2026-04-15T14:57:46.574Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/safe-yj/instances 200
+[debug] [2026-04-15T14:57:46.576Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/safe-yj/instances {}
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged /Users/bcpark/Desktop/git_rep/safe_yjbc/functions (74.01 KB) for uploading 
+[debug] [2026-04-15T14:57:46.654Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:46.654Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:46.654Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/safe-yj/locations/-/functions [none]
+[debug] [2026-04-15T14:57:47.814Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/safe-yj/locations/-/functions 200
+[debug] [2026-04-15T14:57:47.815Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/safe-yj/locations/-/functions {}
+[debug] [2026-04-15T14:57:47.815Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:47.815Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:47.815Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/safe-yj/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2026-04-15T14:57:50.149Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/safe-yj/locations/-/functions 200
+[debug] [2026-04-15T14:57:50.150Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/safe-yj/locations/-/functions {"functions":[{"name":"projects/safe-yj/locations/us-central1/functions/cleanupExpiredHomeEvents","buildConfig":{"build":"projects/431566844297/locations/us-central1/builds/fff933bb-cb47-40eb-8648-a27035984d6a","runtime":"nodejs20","entryPoint":"cleanupExpiredHomeEvents","source":{"storageSource":{"bucket":"gcf-v2-sources-431566844297-us-central1","object":"cleanupExpiredHomeEvents/function-source.zip","generation":"1776000345697903"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/safe-yj/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-431566844297-us-central1","object":"cleanupExpiredHomeEvents/function-source.zip","generation":"1776000345697903"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/safe-yj/serviceAccounts/431566844297-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/safe-yj/locations/us-central1/services/cleanupexpiredhomeevents","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"safe-yj\",\"storageBucket\":\"safe-yj.firebasestorage.app\"}","GCLOUD_PROJECT":"safe-yj","EVENTARC_CLOUD_EVENT_SOURCE":"projects/safe-yj/locations/us-central1/services/cleanupExpiredHomeEvents","FUNCTION_TARGET":"cleanupExpiredHomeEvents","LOG_EXECUTION_ID":"true","FUNCTION_SIGNATURE_TYPE":"http"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://cleanupexpiredhomeevents-zdgujvjrva-uc.a.run.app","serviceAccountEmail":"431566844297-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"cleanupexpiredhomeevents-00006-cis","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"state":"ACTIVE","updateTime":"2026-04-12T13:25:52.510493281Z","labels":{"deployment-tool":"cli-firebase","deployment-scheduled":"true","firebase-functions-hash":"2e58bb28540f70c7b56c1e573ff84380d65f2eae"},"environment":"GEN_2","url":"https://us-central1-safe-yj.cloudfunctions.net/cleanupExpiredHomeEvents","createTime":"2026-04-10T08:09:40.656062271Z","satisfiesPzi":true},{"name":"projects/safe-yj/locations/us-central1/functions/sendSOSNotification","buildConfig":{"build":"projects/431566844297/locations/us-central1/builds/fff933bb-cb47-40eb-8648-a27035984d6a","runtime":"nodejs20","entryPoint":"sendSOSNotification","source":{"storageSource":{"bucket":"gcf-v2-sources-431566844297-us-central1","object":"sendSOSNotification/function-source.zip","generation":"1776000275992194"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/safe-yj/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-431566844297-us-central1","object":"sendSOSNotification/function-source.zip","generation":"1776000275992194"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/safe-yj/serviceAccounts/431566844297-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/safe-yj/locations/us-central1/services/sendsosnotification","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"safe-yj\",\"storageBucket\":\"safe-yj.firebasestorage.app\"}","GCLOUD_PROJECT":"safe-yj","EVENTARC_CLOUD_EVENT_SOURCE":"projects/safe-yj/locations/us-central1/services/sendSOSNotification","FUNCTION_SIGNATURE_TYPE":"cloudevent","FUNCTION_TARGET":"sendSOSNotification","LOG_EXECUTION_ID":"true"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://sendsosnotification-zdgujvjrva-uc.a.run.app","serviceAccountEmail":"431566844297-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"sendsosnotification-00013-moh","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"eventTrigger":{"trigger":"projects/safe-yj/locations/asia-northeast3/triggers/sendsosnotification-978532","triggerRegion":"asia-northeast3","eventType":"google.cloud.firestore.document.v1.created","eventFilters":[{"attribute":"database","value":"(default)"},{"attribute":"namespace","value":"(default)"},{"attribute":"document","value":"home_events/{docId}","operator":"match-path-pattern"}],"pubsubTopic":"projects/safe-yj/topics/eventarc-asia-northeast3-sendsosnotification-978532-859","serviceAccountEmail":"431566844297-compute@developer.gserviceaccount.com","retryPolicy":"RETRY_POLICY_DO_NOT_RETRY"},"state":"ACTIVE","updateTime":"2026-04-12T13:25:44.747901250Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"2e58bb28540f70c7b56c1e573ff84380d65f2eae"},"environment":"GEN_2","url":"https://us-central1-safe-yj.cloudfunctions.net/sendSOSNotification","createTime":"2026-04-10T06:10:43.027830631Z","satisfiesPzi":true}]}
+[debug] [2026-04-15T14:57:50.156Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:50.156Z] Checked if tokens are valid: true, expires at: 1776268654553
+[debug] [2026-04-15T14:57:50.157Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/safe-yj/databases/(default) [none]

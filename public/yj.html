@@ -733,7 +733,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp }
+    import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, serverTimestamp }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // ✅ Firebase 설정
@@ -776,7 +776,6 @@
       collection(db, "home_events"),
       where("to", "==", "yj"),
       orderBy("timestamp", "desc"),
-      limit(10)
     );
 
 
@@ -789,7 +788,6 @@
       collection(db, "home_events"),
       where("from", "==", "yj"),
       orderBy("timestamp", "desc"),
-      limit(10)
     );
     onSnapshot(qSent, (snap) => {
       sentDocs = snap.docs;

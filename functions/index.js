@@ -113,7 +113,7 @@ exports.sendSOSNotification = onDocumentCreated(
       await snap.ref.update({
         status: "notified",
         notifiedAt: new Date(),
-        expireAt: new Date(Date.now() + 12 * 60 * 60 * 1000),
+        expireAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       });
 
     } catch (err) {
@@ -126,7 +126,7 @@ exports.cleanupExpiredHomeEvents = onSchedule("every 1 hours", async (event) => 
   const db = getFirestore();
   const now = new Date();
   const q = db.collection("home_events")
-    .where("timestamp", "<=", new Date(Date.now() - 12 * 60 * 60 * 1000))
+    .where("timestamp", "<=", new Date(Date.now() - 14 * 24 * 60 * 60 * 1000))
     .limit(100);
 
   let snapshot = await q.get();
